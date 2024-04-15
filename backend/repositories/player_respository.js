@@ -1,4 +1,4 @@
-const Player = require('./models/player')
+const Player = require('../models/player')
 
 class PlayerRepository {
     constructor(model) {

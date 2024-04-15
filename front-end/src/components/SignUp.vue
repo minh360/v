@@ -28,7 +28,7 @@
 <script setup>
 import {ref} from 'vue'
 import {socket} from "@/main";
-import {checkExist} from '../../../backend/api'
+import {checkExist,addNewAccount} from '../../../backend/api'
 const ingame = ref('')
 const password = ref('')
 const message = ref('')
@@ -56,9 +56,15 @@ const signUp = async () => {
         .catch(err =>
             console.log(err.response.data)
         );
-        message.value = user_exits ? 'Ingame đã tồn tại' : ''
-    if(!user_exits){
-      location.reload()
+        message.value = player_exist ? 'Ingame đã tồn tại' : ''
+    if(!player_exist){
+      await addNewAccount(ingame.value,password.value)
+        .then(result =>{
+          message.value = 'Đăng ký thành công'
+        })
+        .catch(err =>
+            console.log(err.response.data)
+        );
     }
   }
 }

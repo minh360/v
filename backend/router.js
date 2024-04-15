@@ -1,8 +1,8 @@
 const express = require("express");
-const router = express.Router()
-const player_repository = require('./repositories/player_repository')
-const bot_repository = require('./repositories/bot_repository')
-const bot_create_repository = require('./repositories/bot_create_repository')
+const router = new express.Router()
+const player_repository = require('./repositories/player_respository')
+const bot_repository = require('./repositories/bot_respostitory')
+const bot_create_repository = require('./repositories/bot_create_respostitory')
 //----------------------auth--------------------------
 router.post('/auth/sign_up', (req, res) => {
     const newPlayer = req.body;
@@ -33,3 +33,5 @@ router.put('/auth/change_coin/:id', (req, res) => {
         res.status(200).json(player.ingame);
     }).catch(error => console.log(error));
 });
+
+module.exports = router

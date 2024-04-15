@@ -5,4 +5,4 @@ const playerSchema = new Schema({
     password: String,
     coin: Number
 });
-module.exports = mongoose.model('player', playerSchema);
+module.exports = mongoose.model('players', playerSchema);

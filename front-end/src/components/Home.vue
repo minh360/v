@@ -14,7 +14,7 @@ import { ref } from 'vue'
 import Lobby from './Lobby.vue'
 import Play from './Play.vue'
 
-const isLogined = ref(true)
+const isLogined = ref(false)
 
 </script>
 <style scoped>

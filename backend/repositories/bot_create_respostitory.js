@@ -1,4 +1,4 @@
-const BotCreate = require('./models/bot_create')
+const BotCreate = require('../models/bot_create')
 
 class BotCreateRepository {
     constructor(model) {
