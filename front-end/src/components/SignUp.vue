@@ -28,6 +28,7 @@
 <script setup>
 import {ref} from 'vue'
 import {socket} from "@/main";
+import {checkExist} from '../../../backend/api'
 const ingame = ref('')
 const password = ref('')
 const message = ref('')
@@ -47,7 +48,18 @@ const checkError = () => {
 const signUp = async () => {
   checkError()
   if(message.value === ''){
-    socket.emit('checkExist',ingame.value)
+    let player_exist
+    await checkExist(ingame.value)
+        .then(result =>{
+          player_exist = result.data
+        })
+        .catch(err =>
+            console.log(err.response.data)
+        );
+        message.value = user_exits ? 'Ingame đã tồn tại' : ''
+    if(!user_exits){
+      location.reload()
+    }
   }
 }
 </script>

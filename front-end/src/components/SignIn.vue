@@ -31,8 +31,30 @@ import {ref} from 'vue'
 const ingame = ref('')
 const password = ref('')
 const message = ref('')
-const signIn = () => {
-    
+const checkError = () => {
+  let regex = /^[a-z\d]+$/
+  if(ingame.value == '')
+    message.value = 'Vui lòng nhập Ingame!!!'
+  else if(ingame.value.length < 6 || ingame.value.length >10 )
+    message.value = 'Độ dài Ingame phải từ 6 đến 10 kí tự'
+  else if(password.value == '')
+    message.value = 'Vui lòng nhập Password!!!'
+  else if(!regex.test(ingame.value))
+    message.value = 'Ingame phải có kí tự chữ, số và không có dấu, kí tự đặc biệt!!!'
+  else message.value = ''
+}
+const signIn = async () => {
+  checkError()
+  if(message.value === ''){
+    await checkExist(ingame.value)
+        .then(player => {
+          sessionStorage.getItem('id_player',player.data._id)
+        })
+        .catch(err =>{
+            message.value = 'Tài khoản hoặc mật khẩu không chính xác'
+            console.log(err.response.data)
+        });
+  }
 }
 </script>
 <style scoped lang="scss"></style>

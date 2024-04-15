@@ -12,7 +12,7 @@ const dayjs = require("dayjs");
 app.use(cors())
 app.use('/', serveStatic(path.join(__dirname, '/dist')))
 
-mongoose.connect('mongodb+srv://minh231120012:setdanh113@cluster0.wuz4vl8.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+mongoose.connect('mongodb://localhost:27017/user')
 
 const db = mongoose.connection;
 db.once('open', function(){
