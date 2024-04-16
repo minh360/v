@@ -1,5 +1,5 @@
 <template>
-    <div class="w-[75%] text-[20px] rounded-[50px] font-bold text-center bg-[rosybrown]">
+    <div class="w-[60vw] text-[20px] rounded-[50px] font-bold text-center bg-[rosybrown]">
         <div class="marquee mx-[20px]">
             <marquee>{{ message }}</marquee>
         </div>

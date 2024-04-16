@@ -4,7 +4,14 @@
       <Lobby />
     </div>
     <div v-else>
-      <Play />
+      <div class="flex w-full">
+        <div>
+          <Play />
+        </div>
+        <div class="flex-grow">
+          <Chat />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -13,8 +20,9 @@
 import { ref } from 'vue'
 import Lobby from './Lobby.vue'
 import Play from './Play.vue'
+import Chat from './Chat.vue'
 
-const isLogined = ref(false)
+const isLogined = ref(true)
 
 </script>
 <style scoped>
@@ -24,5 +32,4 @@ const isLogined = ref(false)
   background-size: cover;
   background-position: center;
 }
-
 </style>
