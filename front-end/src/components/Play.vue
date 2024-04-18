@@ -7,8 +7,10 @@
             <div class="text-[darkred] text-[30px] uppercase">Vòng quay may mắn
             </div>
             <div class="text-[red]">Bạn đang có {{ format(coin) }} xu</div>
-            <div class="text-[orange] text-[50px]"><span v-show="minute > 0">{{ minute }}:</span><span>{{ second }}<span
-                        v-show="minute <= 0">s</span></span></div>
+
+            <div class="text-[orange] text-[50px]">
+                <span v-show="minute > 0">{{ minute }}:</span><span>{{ second }}<span v-show="minute <= 0">s</span></span>
+            </div>
             <div class="text-[orange] font-bold">Tỉ lệ thắng</div>
             <div class="percent-wrapper">
                 <div :style="stylePercent"></div>
@@ -19,16 +21,16 @@
             <div>Bạn đã tham gia: {{ format(coinJoin) }}</div>
             <div></div>
             <div>
-                <div>Người vừa chiến thắng: {{ lastUserWin }}</div>
-                <div>Số coin thắng: {{ format(lastCoinWin) }}</div>
-                <div>Số coin tham gia: {{ format(lastCoinJoin) }}</div>
+                <div>Người vừa chiến thắng: {{ lastPlayerWin ? lastPlayerWin : 'Chưa có thông tin'}}</div>
+                <div>Số coin thắng: {{ lastCoinWin ? format(lastCoinWin) : 'Chưa có thông tin' }}</div>
+                <div>Số coin tham gia: {{ lastCoinJoin ? format(lastCoinJoin) : 'Chưa có thông tin'}}</div>
             </div>
 
             <div style="height: 2px"></div>
 
             <input type="number" class="pl-[20px] w-[500px] rounded h-[50px]" 
             v-if="isInputed" v-model="coinInput" placeholder="Tham gia từ 1tr đến 50tr"
-            v-on:keyup.enter="joinSeasonClient()"/>
+            v-on:keyup.enter="play()"/>
 
             <button v-if="id_player && !isInputed" @click="showInput(true)" class="w-[30%] mb-[20px]">Tham gia</button>
             <div v-if="id_player && isInputed" class="flex mb-[20px]">
@@ -38,10 +40,12 @@
     </div>
 </template>
 <script setup>
-import { computed, ref } from 'vue';
+import { socket } from '@/main';
+import { computed, onMounted, ref } from 'vue';
+import { checkExist } from '../../../backend/api';
 const stylePercent = computed(() => {
     return {
-        'margin' : '-2px 0 0 -1px',
+        'margin' : '0 0 0 0',
         'backgroundColor': 'red',
         'width': percent.value + '%',
         'height': "25px",
@@ -51,28 +55,48 @@ const stylePercent = computed(() => {
     }
 })
 const message = ref('Chào mừng đến với vòng xoay may rủi')
-const minute = ref()
-const second = ref()
-const percent = ref(0)
-const coin = ref (50000000)
-const totalCoins = ref(0)
-const countPlayerJoin = ref(0)
-const coinJoin = ref(0)
-const lastUserWin = ref(0)
-const lastCoinWin = ref(0)
-const lastCoinJoin = ref(0)
-const coinInput = ref('')
+const timeCountDownMilli = ref(0)
+const ingameClient = ref(sessionStorage.getItem('ingame_client'))
 
+const percent = ref(0)
+const coin = ref (0)
+const totalCoins = ref(0)
+
+const coinJoin = ref(0)
+const countPlayerJoin = ref(0)
+
+const lastCoinJoin = ref(0)
+const lastPlayerWin = ref(0)
+const lastCoinWin = ref(0)
+const coinInput = ref(0)
+
+const minute = computed(()=>{
+  const minute = Math.floor(timeCountDownMilli.value / 60 % 60)
+  return minute < 10 ? '0' + minute : minute
+})
+const second = computed(()=>{
+  const second = Math.floor(timeCountDownMilli.value % 60)
+  return second < 10 ? '0' + second : second
+})
 
 const isInputed = ref(false)
 const showInput = value => {
     isInputed.value = value
 }
 
-const id_player = ref('4262756457er')
+const id_player = ref(sessionStorage.getItem('id_player'))
 
-
-const format = number => {
+const play = () =>{
+    socket.emit('play',{id_player: id_player.value,ingame: ingameClient.value, coinJoin: coinInput.value})
+    coinInput.value = 0
+}
+const updateCoin = async() =>{
+    await checkExist(ingameClient.value)
+        .then(result =>{
+          coin.value = result.data.coin
+        })
+}
+const format = (number) => {
     let result = ''
     const len = number.toString().length
     for (let i = 1; i <= len; i++) {
@@ -83,6 +107,27 @@ const format = number => {
     }
     return result
 }
+socket.on('letgo',time =>{
+    timeCountDownMilli.value = time
+})
+socket.on('reload',()=>{
+    socket.emit('justDoIt',id_player.value)
+})
+socket.on('updatePlayerPlay', result =>{
+    totalCoins.value = result[1]
+    countPlayerJoin.value = result[2]
+    coinJoin.value = result[0].coinJoin
+    percent.value = result[0].percent
+})
+setTimeout(socket.emit('updateLastWin'),500)
+socket.on('sendLastWin',lastWin =>{
+    lastPlayerWin.value = lastWin.ingame
+    lastCoinJoin.value = lastWin.coinJoin
+    lastCoinWin.value = lastWin.coinWin
+})
+onMounted(()=>{
+    updateCoin()
+})
 </script>
 <style scoped lang="scss">
 .marquee {

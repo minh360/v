@@ -27,7 +27,6 @@
 </template>
 <script setup>
 import {ref} from 'vue'
-import {socket} from "@/main";
 import {checkExist,addNewAccount} from '../../../backend/api'
 const ingame = ref('')
 const password = ref('')

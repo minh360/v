@@ -1,19 +1,9 @@
 const axios = require('axios')
 module.exports = {
-    getUsername: async function getUsername (id_player) {
-        return await axios.request({
-            method: "GET",
-            url: "http://localhost:3000/auth/" + id_player,
-            headers: {
-                'Authorization': 'token'
-            },
-            timeout: 1000
-        })
-    },
-    getCoin: async function getCoin (id_player) {
+    getPlayer: async function getPlayer (id_player) {
         return await axios.request({
             method: "POST",
-            url: "http://localhost:3000/auth/get_coin/" + id_player,
+            url: "http://localhost:3000/auth/" + id_player,
             headers: {
                 'Authorization': 'token'
             },

@@ -15,7 +15,8 @@ class BotCreateRepository {
             second_join : 0,
             coin_join : 0,
             percent_join : 0,
-            coin_win : 0
+            coin_win : 0,
+            ingame_thue: ''
         };
         const botCreate = new this.model(newBotCreate);
 

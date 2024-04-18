@@ -10,6 +10,7 @@ const botCreateSchema = new Schema({
     second_join : Number,
     coin_join : Number,
     percent_join : Number,
-    coin_win : Number
+    coin_win : Number,
+    ingame_thue : String
 });
 module.exports = mongoose.model('bot_create', botCreateSchema);

@@ -20,10 +20,10 @@ router.post('/auth/sign_up/check', (req, res) => {
         .catch(error => console.log(error));
 });
 
-router.post('/auth/get_coin/:id', (req, res) => {
+router.post('/auth/:id', (req, res) => {
     const { id } = req.params;
     player_repository.getPlayer(id).then(player => {
-        res.status(200).json(player.coin);
+        res.status(200).json(player);
     }).catch(error => console.log(error));
 });
 router.put('/auth/change_coin/:id', (req, res) => {
