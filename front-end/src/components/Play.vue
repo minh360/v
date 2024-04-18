@@ -26,12 +26,13 @@
 
             <div style="height: 2px"></div>
 
-            <input type="number" class="pl-[20px] w-[500px] rounded h-[50px]" v-if="isInputed" v-model="coinInput" placeholder="Tham gia từ 1tr đến 50tr"/>
+            <input type="number" class="pl-[20px] w-[500px] rounded h-[50px]" 
+            v-if="isInputed" v-model="coinInput" placeholder="Tham gia từ 1tr đến 50tr"
+            v-on:keyup.enter="joinSeasonClient()"/>
 
             <button v-if="id_player && !isInputed" @click="showInput(true)" class="w-[30%] mb-[20px]">Tham gia</button>
-            <div v-if="id_player && isInputed" class="flex gap-[10px] mb-[20px]">
-                <button class="cursor-pointer w-[290px]" @click="joinSeasonClient()">Tham gia</button>
-                <button class="cursor-pointer w-[200px]" @click="showInput(false)">Đóng</button>
+            <div v-if="id_player && isInputed" class="flex mb-[20px]">
+                <button class="cursor w-[200px]" @click="showInput(false)">Đóng</button>
             </div>
         </div>
     </div>

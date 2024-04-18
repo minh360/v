@@ -28,6 +28,7 @@
 </template>
 <script setup>
 import {ref} from 'vue'
+import { checkExist } from '../../../backend/api';
 const ingame = ref('')
 const password = ref('')
 const message = ref('')
@@ -48,7 +49,10 @@ const signIn = async () => {
   if(message.value === ''){
     await checkExist(ingame.value)
         .then(player => {
-          sessionStorage.getItem('id_player',player.data._id)
+          message.value = 'Đăng nhập thành công tài khoản '+ ingame.value
+          sessionStorage.setItem('id_player',player.data._id)
+          sessionStorage.setItem('ingame_client',player.data.ingame)
+          setTimeout(()=>location.reload(),2000)
         })
         .catch(err =>{
             message.value = 'Tài khoản hoặc mật khẩu không chính xác'

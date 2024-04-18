@@ -2,11 +2,11 @@
   <div class="backdrop-blur w-full flex justify-center items-center uppercase">
     <div class="absoluted top-0 mt-[100px] text-white border border-1 border-[black] rounded-[25px] w-[600px] h-auto mx-auto">
       <div class="uppercase p-[20px] w-full h-[60px] flex justify-around text-[35px]">
-        <div class="cursor-pointer font-bold" :class="{ active: STATUS.SIGN_UP == status }"
+        <div class="cursor" :class="{ active: STATUS.SIGN_UP == status }"
           @click="setStatus(STATUS.SIGN_UP)">
           Đăng ký
         </div>
-        <div class="cursor-pointer font-bold" :class="{ active: STATUS.SIGN_IN == status }"
+        <div class="cursor" :class="{ active: STATUS.SIGN_IN == status }"
           @click="setStatus(STATUS.SIGN_IN)">
           Đăng nhập
         </div>
@@ -19,7 +19,7 @@
   </div>
 </template>
 <script setup>
-import {ref} from 'vue'
+import {ref,defineProps} from 'vue'
 import SignIn from './SignIn.vue'
 import SignUp from './SignUp.vue'
 const STATUS = {

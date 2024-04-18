@@ -16,4 +16,8 @@ import Home from './components/Home.vue'
   -ms-user-select: none;
   user-select: none;
 }
+.cursor{
+  font-weight: bold;
+  cursor: pointer;
+}
 </style>
