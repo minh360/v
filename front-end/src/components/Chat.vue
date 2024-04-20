@@ -3,10 +3,10 @@
         <div @click="emits('closeChat')" class="text-[30px] cursor absolute right-0 px-[50px]">X</div>
         <div class="text-[30px] font-bold text-center">Chat</div>
         <div ref="data" id="data" class="flex flex-col px-[50px] text-[20px] cursor">
-            <div v-for="(chat,index) in list_chat" :key="index" :class="{left : chat.ingame == ingameClient}">
-                <div class="text-right text-[violet]">{{ chat.ingame }}</div>
-                <div class="text-right text-[gray]">{{ chat.message }}</div>
-                <div class='text-right text-[red]' v-if="chat.alert">{{ chat.alert }}</div>
+            <div v-for="(chat,index) in list_chat" :key="index" >
+                <div class="text-right text-[violet]" :class="{left : chat.ingame == ingameClient}">{{ chat.ingame }}</div>
+                <div class="text-right text-[gray]" :class="{left : chat.ingame == ingameClient}">{{ chat.message }}</div>
+                <div class='text-right text-[red]' :class="{left : chat.ingame == ingameClient}" v-if="chat.alert">{{ chat.alert }}</div>
             </div>
         </div>
         <input type="text" class="w-[500px] mt-[10px] px-[20px] rounded h-[40px]" 
@@ -65,6 +65,6 @@ onMounted(() => {
     background-color: bisque
 }
 .left{
-    text-align: left;
+    text-align: left !important;
 }
 </style>

@@ -29,6 +29,7 @@
 <script setup>
 import {ref} from 'vue'
 import { checkExist } from '../../../backend/api';
+import { socket } from '@/main';
 const ingame = ref('')
 const password = ref('')
 const message = ref('')
@@ -52,6 +53,7 @@ const signIn = async () => {
           message.value = 'Đăng nhập thành công tài khoản '+ ingame.value
           sessionStorage.setItem('id_player',player.data._id)
           sessionStorage.setItem('ingame_client',player.data.ingame)
+          socket.emit('updateChat',{alert: player.data.ingame + ' đã tham gia chat'})
           setTimeout(()=>location.reload(),2000)
         })
         .catch(err =>{

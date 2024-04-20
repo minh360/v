@@ -33,5 +33,23 @@ router.put('/auth/change_coin/:id', (req, res) => {
         res.status(200).json(player.coin);
     }).catch(error => console.log(error));
 });
-
+//--------------------------Bot----------------------------
+router.get('/bot/:ingame', (req, res) => {
+    const { ingame } = req.params;
+    bot_repository.createBot({ingame: ingame}).then(bot => {
+        res.status(200).json(bot);
+    }).catch(error => console.log(error));
+});
+router.get('/bot', (req, res) => {
+    bot_repository.getAllBot().then(list => {
+        res.status(200).json(list);
+    }).catch(error => console.log(error));
+});
+router.put('/bot/change_coin/:id',(req, res) => {
+    const { id } = req.params;
+    const coin = req.body.coin;
+    bot_repository.changeCoin(id,coin).then(bot => {
+        res.status(200).json(bot);
+    }).catch(error => console.log(error));
+});
 module.exports = router

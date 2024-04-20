@@ -45,6 +45,30 @@ module.exports = {
             data: {
                 coin: coin
             },
+            timeout : 1000
+        })
+    },
+    getAllBot: function getAllBot () {
+        return axios.request({
+            method: "GET",
+            url: "http://localhost:3000/bot",
+            headers: {
+                'Authorization': 'token'
+            },
+            timeout : 1000
+        })
+    },
+    changeCoinBot: function changeCoinBot (id_bot,coin) {
+        return axios.request({
+            method: "PUT",
+            url: "http://localhost:3000/bot/change_coin/" + id_bot,
+            headers: {
+                'Authorization': 'token'
+            },
+            data: {
+                coin: coin
+            },
+            timeout : 1000
         })
     },
 }

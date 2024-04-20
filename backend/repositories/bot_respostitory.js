@@ -4,7 +4,7 @@ class BotRepository {
     constructor(model) {
         this.model = model;
     }
-    create(object){
+    createBot(object){
         const newBot = {
             ingame: object.ingame,
             coin: object.coin ? object.coin : 2000000000
@@ -21,7 +21,7 @@ class BotRepository {
     }
     changeCoin (id,coin){
         const query = { _id: id };
-        return this.model.findOneAndUpdate(query, { $inc: { coin: coin} });
+        return this.model.findOneAndUpdate(query, { $set: { coin: coin} });
     }
 }
 module.exports = new BotRepository(Bot)
