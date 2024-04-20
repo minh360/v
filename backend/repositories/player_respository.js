@@ -22,7 +22,7 @@ class PlayerRepository {
     }
     changeCoin (id,coin){
         const query = { _id: id };
-        return this.model.findOneAndUpdate(query, { $inc: { coin: coin} });
+        return this.model.findOneAndUpdate(query, { $set: { coin: coin} });
     }
 }
 module.exports = new PlayerRepository(Player)

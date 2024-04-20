@@ -1,51 +1,10 @@
-<template>
-    <div class="w-[60vw] text-[20px] rounded-[50px] font-bold text-center bg-[rosybrown]">
-        <div class="marquee mx-[20px]">
-            <marquee>{{ message }}</marquee>
-        </div>
-        <div class="flex gap-[10px] flex-col items-center">
-            <div class="text-[darkred] text-[30px] uppercase">Vòng quay may mắn
-            </div>
-            <div class="text-[red]">Bạn đang có {{ format(coin) }} xu</div>
-
-            <div class="text-[orange] text-[50px]">
-                <span v-show="minute > 0">{{ minute }}:</span><span>{{ second }}<span v-show="minute <= 0">s</span></span>
-            </div>
-            <div class="text-[orange] font-bold">Tỉ lệ thắng</div>
-            <div class="percent-wrapper">
-                <div :style="stylePercent"></div>
-                <div>{{ percent }} %</div>
-            </div>
-            <div class="mt-[15px]">{{ format(totalCoins) }} coin</div>
-            <div>Số người tham gia: {{ countPlayerJoin }}</div>
-            <div>Bạn đã tham gia: {{ format(coinJoin) }}</div>
-            <div></div>
-            <div>
-                <div>Người vừa chiến thắng: {{ lastPlayerWin ? lastPlayerWin : 'Chưa có thông tin'}}</div>
-                <div>Số coin thắng: {{ lastCoinWin ? format(lastCoinWin) : 'Chưa có thông tin' }}</div>
-                <div>Số coin tham gia: {{ lastCoinJoin ? format(lastCoinJoin) : 'Chưa có thông tin'}}</div>
-            </div>
-
-            <div style="height: 2px"></div>
-
-            <input type="number" class="pl-[20px] w-[500px] rounded h-[50px]" 
-            v-if="isInputed" v-model="coinInput" placeholder="Tham gia từ 1tr đến 50tr"
-            v-on:keyup.enter="play()"/>
-
-            <button v-if="id_player && !isInputed" @click="showInput(true)" class="w-[30%] mb-[20px]">Tham gia</button>
-            <div v-if="id_player && isInputed" class="flex mb-[20px]">
-                <button class="cursor w-[200px]" @click="showInput(false)">Đóng</button>
-            </div>
-        </div>
-    </div>
-</template>
 <script setup>
 import { socket } from '@/main';
 import { computed, onMounted, ref } from 'vue';
-import { checkExist } from '../../../backend/api';
+import { getPlayer } from '../../../backend/api';
 const stylePercent = computed(() => {
     return {
-        'margin' : '0 0 0 0',
+        'margin' : '-2px 0 0 0',
         'backgroundColor': 'red',
         'width': percent.value + '%',
         'height': "25px",
@@ -87,11 +46,11 @@ const showInput = value => {
 const id_player = ref(sessionStorage.getItem('id_player'))
 
 const play = () =>{
-    socket.emit('play',{id_player: id_player.value,ingame: ingameClient.value, coinJoin: coinInput.value})
+    socket.emit('play',{id_player: id_player.value,ingame: ingameClient.value, coinJoin: coinInput.value, coin: coin.value})
     coinInput.value = 0
 }
 const updateCoin = async() =>{
-    await checkExist(ingameClient.value)
+    await getPlayer(id_player.value)
         .then(result =>{
           coin.value = result.data.coin
         })
@@ -119,16 +78,64 @@ socket.on('updatePlayerPlay', result =>{
     coinJoin.value = result[0].coinJoin
     percent.value = result[0].percent
 })
-setTimeout(socket.emit('updateLastWin'),500)
+socket.on('updateCoin', async()=>{
+    await updateCoin()
+})
 socket.on('sendLastWin',lastWin =>{
     lastPlayerWin.value = lastWin.ingame
     lastCoinJoin.value = lastWin.coinJoin
     lastCoinWin.value = lastWin.coinWin
+    message.value = 'Chúc mừng '+ lastPlayerWin.value.toUpperCase() + 'đã chiến thắng '+ lastCoinWin.value + ' xu trong vòng quay may rủi'
 })
-onMounted(()=>{
-    updateCoin()
+onMounted(async ()=>{
+    setTimeout(socket.emit('updateLastWin'),500)
+    await updateCoin()
 })
+
 </script>
+
+<template>
+    <div class="w-[60vw] text-[20px] rounded-[50px] font-bold text-center bg-[rosybrown]">
+        <div class="marquee mx-[20px]">
+            <marquee>{{ message }}</marquee>
+        </div>
+        <div class="flex gap-[10px] flex-col items-center">
+            <div class="text-[darkred] text-[30px] uppercase">Vòng quay may mắn
+            </div>
+            <div class="text-[pink]">Bạn đang có {{ format(coin) }} xu</div>
+
+            <div class="text-[orange] text-[50px]">
+                <span v-show="minute > 0">{{ minute }}:</span><span>{{ second }}<span v-show="minute <= 0">s</span></span>
+            </div>
+            <div class="text-[orange] font-bold">Tỉ lệ thắng</div>
+            <div class="percent-wrapper">
+                <div :style="stylePercent"></div>
+                <div>{{ percent }} %</div>
+            </div>
+            <div class="mt-[15px]">{{ format(totalCoins) }} coin</div>
+            <div>Số người tham gia: {{ countPlayerJoin }}</div>
+            <div>Bạn đã tham gia: {{ format(coinJoin) }}</div>
+            <div></div>
+            <div>
+                <div>Người vừa chiến thắng: {{ lastPlayerWin ? lastPlayerWin : 'Chưa có thông tin'}}</div>
+                <div>Số coin thắng: {{ lastCoinWin ? format(lastCoinWin) : 'Chưa có thông tin' }}</div>
+                <div>Số coin tham gia: {{ lastCoinJoin ? format(lastCoinJoin) : 'Chưa có thông tin'}}</div>
+            </div>
+
+            <div style="height: 2px"></div>
+
+            <input type="number" class="pl-[20px] w-[500px] rounded h-[50px]" 
+            v-if="isInputed" v-model="coinInput" placeholder="Tham gia từ 1tr đến 50tr"
+            v-on:keyup.enter="play()"/>
+
+            <button v-if="id_player && !isInputed" @click="showInput(true)" class="w-[30%] mb-[20px]">Tham gia</button>
+            <div v-if="id_player && isInputed" class="flex mb-[20px]">
+                <button class="cursor w-[200px]" @click="showInput(false)">Đóng</button>
+            </div>
+        </div>
+    </div>
+</template>
+
 <style scoped lang="scss">
 .marquee {
     white-space: nowrap;

@@ -30,7 +30,7 @@ router.put('/auth/change_coin/:id', (req, res) => {
     const { id } = req.params;
     const coin = req.body.coin;
     player_repository.changeCoin(id,coin).then(player => {
-        res.status(200).json(player.ingame);
+        res.status(200).json(player.coin);
     }).catch(error => console.log(error));
 });
 

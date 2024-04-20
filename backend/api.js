@@ -35,4 +35,16 @@ module.exports = {
             timeout: 1000
         })
     },
+    changeCoinPlayer: function changeCoinPlayer (id_player,coin) {
+        return axios.request({
+            method: "PUT",
+            url: "http://localhost:3000/auth/change_coin/" + id_player,
+            headers: {
+                'Authorization': 'token'
+            },
+            data: {
+                coin: coin
+            },
+        })
+    },
 }
