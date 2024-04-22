@@ -3,81 +3,127 @@
         <div @click="emits('closeVillager')" class="text-[30px] cursor absolute right-0 px-[50px]">X</div>
         <div class="text-[30px] font-bold text-center">Khu thuê bot</div>
         <div class="grid grid-cols-3 w-full gap-[50px]" id="bot">
-            <div class="rounded-[10px] h-[200px] bg-[white] relative" v-for="(bot,index) in list_bot" :key="index">
-                <div class="text-center font-bold text-[red] text-[25px]">{{ bot.ingame }}</div>
-
-                <div class="text-[15px] cursor absolute top-[10px] right-0 px-[20px]" v-if="bot.coin == 0">X</div>
-
-                <div class="flex flex-col items-center w-full gap-[10px]" v-if="false">
-                    <input type="text" class="w-[50%] border-1 border px-[10px] rounded h-[40px]" v-model="time"
-                        placeholder="Nhập số giây" v-on:keyup.enter="chatClient()" />
-                    <input type="text" class="w-[50%] border-1 border px-[10px] rounded h-[40px]" v-model="coin"
-                        placeholder="Nhập số xu" v-on:keyup.enter="chatClient()" />
-                    <button @click="showInput(true)" class="w-[30%]">Giao dịch</button>
+            <div class="rounded-[10px] h-[200px] bg-[white] relative" v-for="bot in list_bot" :key="bot">
+                <div v-if="bot.mode" class="flex flex-col items-center w-full gap-[50px] my-[50px]">
+                    <input type="text" class="w-[50%] border-1 border px-[10px] rounded h-[40px]" v-model="bot.ingame"
+                            placeholder="Tên bot" />
+                    <button @click="createBot2(bot.ingame)" class="w-[30%]">Tạo bot</button>
                 </div>
+                <div v-else>
+                    <div class="text-center font-bold text-[red] text-[25px]">{{ bot.ingame }}</div>
 
-                <div class="flex flex-col items-center w-full gap-[10px]" v-if="false">
-                    <button @click="showInput(true)" class="w-[30%]">Đặt</button>
-                    <button @click="showInput(true)" class="w-[30%]" v-if="bot.ingame_boss == ingameClient">Nạp</button>
-                    <button @click="showInput(true)" class="w-[30%]" v-if="bot.ingame_boss == ingameClient">Rút</button>
-                </div>
+                    <div class="text-[15px] cursor absolute top-[10px] right-0 px-[20px]" v-if="bot.coin == 0">X</div>
 
-                <div class="flex flex-col items-center justify-center h-full w-full gap-[10px]" v-if="false">
-                    <input type="text" class="w-[50%] border-1 border px-[10px] rounded h-[40px]" v-model="coin"
-                        placeholder="Số xu" v-on:keyup.enter="chatClient()" />
-                    <button @click="showInput(true)" class="w-[30%]">Nạp xu</button>
-                </div>
+                    <div class="flex flex-col items-center w-full gap-[10px]" v-if="bot.status == STATUS.FREE">
+                        <div>{{ format(bot.coin) }} xu</div>
+                        <div class="flex flex-row gap-[5px]">
+                            <button @click="showInput(true)" class="px-[10px]">Đặt</button>
+                            <button @click="showInput(true)" class="px-[10px]"
+                                v-if="bot.ingame_boss == ingameClient">Nạp</button>
+                            <button @click="showInput(true)" class="px-[10px]"
+                                v-if="bot.ingame_boss == ingameClient">Rút</button>
+                        </div> 
+                    </div>
 
-                <div class="flex flex-col items-center justify-center h-full w-full gap-[10px]" v-if="false">
-                    <input type="text" class="w-[50%] border-1 border px-[10px] rounded h-[40px]" v-model="coin"
-                        placeholder="Rút xu" v-on:keyup.enter="chatClient()" />
-                    <button @click="showInput(true)" class="w-[30%]">Rút xu</button>
-                </div>
+                    <div class="flex flex-col items-center justify-center mt-[10px] h-full w-full gap-[10px]" v-if="bot.status == STATUS.DONATE">
+                        <input type="text" class="w-[50%] border-1 border px-[10px] rounded h-[40px]" v-model="coin"
+                            placeholder="Số xu" v-on:keyup.enter="chatClient()" />
+                        <button @click="showInput(true)" class="w-[30%]">Nạp xu</button>
+                    </div>
 
-                <div class="flex flex-col items-center px-[20px] font-bold w-full gap-[10px]" v-if="true">
-                    <p><p class="text-[red] whitespace-pre-line">Trạng thái :</p>&#10;&#13;{{ bot.status_join ? "Đã đặt" : "Chưa đặt" }}</p>
-                    <p><p class="text-[red] whitespace-pre-line">Số xu đặt :</p>&#10;&#13;{{ format(bot.coin_join) }} xu</p>
-                    <p><p class="text-[red] whitespace-pre-line">Tỉ lệ thắng :</p>&#10;&#13;{{ 2.25235235235.toFixed(percent_join) }} %</p>
-                </div>
+                    <div class="flex flex-col items-center justify-center mt-[10px] h-full w-full gap-[10px]" v-if="bot.status == STATUS.SEND">
+                        <input type="text" class="w-[50%] border-1 border px-[10px] rounded h-[40px]" v-model="coin"
+                            placeholder="Rút xu" v-on:keyup.enter="chatClient()" />
+                        <button @click="showInput(true)" class="w-[30%]">Rút xu</button>
+                    </div>
 
-                <span class="font-bold text-[30px]" v-if="bot.status == STATUS.TRADE && bot.ingame">
-                    Đang giao dịch ...
-                </span>
+                    <div class="flex flex-col items-center w-full gap-[10px]" v-if="bot.status == STATUS.TRADE && bot.ingame_thue == ingameClient">
+                        <input type="text" class="w-[50%] border-1 border px-[10px] rounded h-[40px]" v-model="time"
+                            placeholder="Nhập số giây" v-on:keyup.enter="chatClient()" />
+                        <input type="text" class="w-[50%] border-1 border px-[10px] rounded h-[40px]" v-model="coin"
+                            placeholder="Nhập số xu" v-on:keyup.enter="chatClient()" />
+                        <button @click="showInput(true)" class="w-[30%]">Giao dịch</button>
+                    </div>
 
-                <span class="font-bold text-[30px]" v-if="bot.ingame_thue != ingameClient && bot.STATUS == STATUS.BUSY">
-                    Đã có khách thuê ạ
-                </span>
+                    <div class="flex flex-col items-center px-[20px] font-bold w-full gap-[10px]" v-if="bot.status == STATUS.BUSY && bot.ingame_thue == ingameClient">
+                        <p>
+                        <p class="text-[red] whitespace-pre-line">Trạng thái :</p>&#10;&#13;{{ bot.status_join ? "Đã đặt" : "Chưa đặt" }}</p>
+                        <p>
+                        <p class="text-[red] whitespace-pre-line">Số xu đặt :</p>&#10;&#13;{{ format(bot.coin_join) }} xu</p>
+                        <p>
+                        <p class="text-[red] whitespace-pre-line">Tỉ lệ thắng :</p>&#10;&#13;{{ bot.percent_join.toFixed(5) }} %</p>
+                    </div>
 
-                <div class="flex flex-col items-center px-[20px] font-bold w-full h-[50%] gap-[10px]" v-if="false">
-                    <div v-if="false">
-                        <p class="text-[green]" v-if="bot.ingame != name">Đã win rồi hãy giao dịch để lấy xu</p>
-                        <div v-else>
+                    <div class="font-bold text-[30px] mt-[50px]" v-if="bot.status == STATUS.TRADE && bot.ingame_thue != ingameClient">
+                        Đang giao dịch ...
+                  </div>
+
+                  <div class="font-bold text-[30px] mt-[50px]" v-if="bot.status == STATUS.SEND_WIN && bot.ingame_thue != ingameClient">
+                        Đang giao xu win . . .
+                  </div>
+
+                    <div class="font-bold text-[30px] mt-[50px]"
+                        v-if="bot.ingame_thue != ingameClient && bot.status == STATUS.BUSY">
+                        Đã có khách thuê ạ
+                  </div>
+
+                    <div class="flex flex-col items-center px-[20px] font-bold w-full h-[50%] gap-[10px]" 
+                        v-if="bot.status == STATUS.SEND_WIN  && bot.ingame_thue == ingameClient">
+                        <div v-if="bot.ingame == lastPlayerWin">
+                            <p class="text-[green]">Đã win rồi hãy giao dịch để lấy xu</p>
+                            <p>Win : {{ format(lastCoinWin) }} xu</p>
+                            <div class="flex flex-row justify-around w-full mt-[20px]">
+                                <button class="w-[50%]">Giao dịch</button>
+                                <button class="w-[40%]" v-if="bot.ingame_boss == ingameClient">Giữ xu</button>
+                            </div>
+                        </div>
+                        <div v-else class="text-[red] h-full flex flex-col justify-center">
                             <p>Tạch rồi bạn ơi</p>
                             <p>Gấp đôi thôi!!!</p>
                         </div>
-                        <p>Win : {{ format(3000000) }} xu</p>
-                        <div class="flex flex-row justify-around w-full mt-[20px]">
-                            <button class="w-[50%]">Giao dịch</button>
-                            <button class="w-[40%]" v-if="bot.ingame_thue == ingameClient">Giữ xu</button>
-                        </div>
                     </div>
-                    <div v-else class="text-[red] h-full flex flex-col justify-center">
-                        
-                    </div>
+
                 </div>
             </div>
         </div>
         <div>
-            Tạo bot
+            <button class="w-[200px] mb-[20px] absolute bottom-0 ml-[-100px]" @click="createBot1()">Tạo bot</button>
         </div>
 
     </div>
 </template>
 <script setup>
+import { socket } from '@/main';
 import { STATUS } from '@/share';
-import { ref, defineEmits } from 'vue';
+import { ref, defineEmits,onMounted } from 'vue';
+const lastPlayerWin = ref('')
+const lastCoinWin = ref('')
 const emits = defineEmits('oncloseVillager')
+const id_player = ref(sessionStorage.getItem('id_player'))
 const ingameClient = ref(sessionStorage.getItem('ingame_client'))
+const list_bot = ref([
+    {ingame: "2ngay1dem",
+    status : STATUS.FREE , 
+    ingame_boss: ingameClient.value , 
+    coin: 50000000 , 
+    status_join : false,
+    coin_join : 1000000,
+    percent_join : 12.1412412222222222
+}])
+const createBot1 = () => {
+  list_bot.value.unshift({ ingame: '', mode: true })
+}
+const createBot2 = async ingame => {
+  data = {
+    ingame : ingame,
+    id_boss : id_player.value,
+    ingame_boss : ingameClient.value
+  }
+  socket.emit('addBotCreate',data )
+}
+socket.on('updateListBotCreate', list =>{
+  list_bot.value = list
+})
 const format = number => {
     let result = ''
     const len = number.toString().length
@@ -89,12 +135,20 @@ const format = number => {
     }
     return result
 }
+socket.on('sendLastWin',lastWin =>{
+    lastPlayerWin.value = lastWin.ingame
+    lastCoinWin.value = lastWin.coinWin
+})
+onMounted(async ()=>{
+    setTimeout(socket.emit('updateLastWin'),500)
+})
 </script>
 <style lang="scss" scoped>
-#bot{
-    overflow-x:hidden;
-    overflow-y:visible;
+#bot {
+    overflow-x: hidden;
+    overflow-y: visible;
 }
+
 button {
     border-radius: 10px;
     background-color: bisque;

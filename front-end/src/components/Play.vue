@@ -46,8 +46,20 @@ const showInput = value => {
 const id_player = ref(sessionStorage.getItem('id_player'))
 
 const play = () =>{
-    socket.emit('play',{id_player: id_player.value,ingame: ingameClient.value, coinJoin: coinInput.value, coin: coin.value})
-    coinInput.value = 0
+    let regex = /^\d+$/
+    if(timeCountDownMilli.value <= 9000)
+        alert('Vxmm đã được khóa lúc 10s')
+    else if (coin.value - coinInput < 0)
+        alert('Số xu không đủ chơi')
+    else if(!regex.test(coinInput.value))
+        alert('Vui lòng nhập số đàng hoàng :)))')
+    else if((coinInput.value + coinJoin.value) > 50000000 || coinInput.value < 1000000)
+        alert('Vui lòng đặt theo quy định từ 1.000.000 coin đến 50.000.000 coin')
+    else{
+        socket.emit('play',{id_player: id_player.value,ingame: ingameClient.value, coinJoin: coinInput.value, coin: coin.value})
+        coinInput.value = 0
+        isInputed.value = false
+    }
 }
 const updateCoin = async() =>{
     await getPlayer(id_player.value)
@@ -85,7 +97,7 @@ socket.on('sendLastWin',lastWin =>{
     lastPlayerWin.value = lastWin.ingame
     lastCoinJoin.value = lastWin.coinJoin
     lastCoinWin.value = lastWin.coinWin
-    message.value = 'Chúc mừng '+ lastPlayerWin.value.toUpperCase() + 'đã chiến thắng '+ lastCoinWin.value + ' xu trong vòng quay may rủi'
+    message.value = 'Chúc mừng '+ lastPlayerWin.value + ' đã chiến thắng '+ format(lastCoinWin.value) + ' xu trong vòng quay may rủi'
 })
 onMounted(async ()=>{
     setTimeout(socket.emit('updateLastWin'),500)
@@ -99,12 +111,12 @@ onMounted(async ()=>{
         <div class="marquee mx-[20px]">
             <marquee>{{ message }}</marquee>
         </div>
-        <div class="flex gap-[10px] flex-col items-center">
+        <div class="flex gap-[5px] flex-col items-center">
             <div class="text-[darkred] text-[30px] uppercase">Vòng quay may mắn
             </div>
             <div class="text-[pink]">Bạn đang có {{ format(coin) }} xu</div>
 
-            <div class="text-[orange] text-[50px]">
+            <div class="text-[orange] text-[48px]">
                 <span v-show="minute > 0">{{ minute }}:</span><span>{{ second }}<span v-show="minute <= 0">s</span></span>
             </div>
             <div class="text-[orange] font-bold">Tỉ lệ thắng</div>
@@ -112,7 +124,7 @@ onMounted(async ()=>{
                 <div :style="stylePercent"></div>
                 <div>{{ percent }} %</div>
             </div>
-            <div class="mt-[15px]">{{ format(totalCoins) }} coin</div>
+            <div class="mt-[20px]">{{ format(totalCoins) }} xu</div>
             <div>Số người tham gia: {{ countPlayerJoin }}</div>
             <div>Bạn đã tham gia: {{ format(coinJoin) }}</div>
             <div></div>
@@ -121,17 +133,17 @@ onMounted(async ()=>{
                 <div>Số coin thắng: {{ lastCoinWin ? format(lastCoinWin) : 'Chưa có thông tin' }}</div>
                 <div>Số coin tham gia: {{ lastCoinJoin ? format(lastCoinJoin) : 'Chưa có thông tin'}}</div>
             </div>
+            <div class="flex flex-row gap-[20px]">
+                <input type="number" class="pl-[20px] w-[500px] rounded h-[50px]" 
+                v-if="isInputed" v-model="coinInput" placeholder="Tham gia từ 1tr đến 50tr"
+                v-on:keyup.enter="play()"/>
 
-            <div style="height: 2px"></div>
-
-            <input type="number" class="pl-[20px] w-[500px] rounded h-[50px]" 
-            v-if="isInputed" v-model="coinInput" placeholder="Tham gia từ 1tr đến 50tr"
-            v-on:keyup.enter="play()"/>
-
-            <button v-if="id_player && !isInputed" @click="showInput(true)" class="w-[30%] mb-[20px]">Tham gia</button>
-            <div v-if="id_player && isInputed" class="flex mb-[20px]">
-                <button class="cursor w-[200px]" @click="showInput(false)">Đóng</button>
+                <button v-if="id_player && !isInputed" @click="showInput(true)" class="w-[200px] mb-[20px]">Tham gia</button>
+                <div v-if="id_player && isInputed" class="flex mb-[20px]">
+                    <button class="cursor w-[200px]" @click="showInput(false)">Đóng</button>
+                </div>
             </div>
+
         </div>
     </div>
 </template>

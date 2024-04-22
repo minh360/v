@@ -34,10 +34,11 @@ let list_play = []
 let list_bot = []
 let totalCoin = 0
 let countPlayerJoin = 0
-let timeout = 10
+let timeout = 120
 let begin = 0
-let day = new Date(2022,1,12)
+let day = new Date(2023, 23, 1)
 let hours = []
+let list_ready = []
 const calcAndFindPercent = id_player => {
   let percent_flag = 0
   let coinJoin = 0
@@ -78,7 +79,6 @@ const findIdWin = () => {
   else VAT = countPlayerJoin - 1
 
   totalCoin = (totalCoin - (totalCoin * VAT / 100)).toFixed(0)
-
   for (let i = 0; i < listPercent.length; i++) {
     numberPercent += listPercent[i]
     if (numberPercent > percentWin) {
@@ -89,56 +89,99 @@ const findIdWin = () => {
 const getBot = async () => {
   list_bot = []
   await getAllBot()
-    .then(async data => {
-      const list = data
-      for (let i = 0; i < list.length; i++) {
+    .then(async list => {
+      const data = list.data
+      for (let i = 0; i < data.length; i++) {
         list_bot.push({
-          id: list[i]._id,
-          ingame: list[i].ingame,
-          coin: list[i].coin
+          id: data[i]._id,
+          ingame: data[i].ingame,
+          coin: data[i].coin
         })
       }
     })
     .catch(err => console.log(err))
 }
-// const caclBotPlay = () => {
-//   if(day != new Date()){
-//     day = new Date()
-//     hours = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
-//     for(let i = 0;i<8;i++){
-//       const random = Math.floor(Math.random() * hours.length)
-//       hours.splice(random,1)
-//     }
-//   }
-//   else{
-//     const random = 
-//   }
-// }
+const randomMain = (min = 0, max = 100) => {
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+const caclHourPlay = () => {
+  if (day.getDate() != new Date().getDate()) {
+    day = new Date()
+    hours = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+    for (let i = 0; i < 8; i++) {
+      const random = Math.floor(Math.random() * hours.length)
+      hours.splice(random, 1)
+    }
+    caclBotPlay()
+  }
+  else caclBotPlay()
+}
+const caclBotJoin = percent => {
+  if (percent <= 60)
+    return randomMain(1000000,10000000)
+  else if (percent > 60 && percent <=90 ){
+    return randomMain(10000000,20000000)
+  }
+  else if (percent > 90 && percent <=95 ){
+    return randomMain(20000000,30000000)
+  }
+  else if (percent > 95 && percent <=98 ){
+    return randomMain(30000000,40000000)
+  }
+  else if (percent > 98 && percent <=100 ){
+    return randomMain(40000000,50000000)
+  }
+}
+const caclBotPlay = () => {
+  list_ready = []
+  min = hours.includes(day.getHours()) == true ? 10 : 1
+  max = hours.includes(day.getHours()) == true ? 30 : 10
+  let num = randomMain(min, max)
+  for (let j = 0; j <= num; j++) {
+    const bot = list_bot[randomMain(0, list_bot.length - 1)]
+    while (list_ready.includes(bot) == true) {
+      bot = list_bot[randomMain(0, list_bot.length - 1)]
+    }
+    const coin = caclBotJoin(randomMain())
+    const setTime = randomMain(10, 120)
+    list_ready.push({ bot, ...{ time: setTime }, ...{ coin : coin}})
+  }
+}
 io.on('connection', (socket) => {
   const beginPlay = () => {
     const countdown = setInterval(() => {
       socket.emit('letgo', timeout)
       socket.broadcast.emit('letgo', timeout)
       timeout -= 1
-      console.log('countdown', timeout)
+      for (let x = 0;x < list_ready.length;x++){
+        if(list_ready[x].time == timeout){
+          countPlayerJoin += 1
+          totalCoin += list_ready[x].coin
+          list_play.push({ id_player: list_ready[x].bot.id, ingame: list_ready[x].bot.ingame, coinJoin: list_ready[x].coin, percent: 0 })
+          const del = calcAndFindPercent(list_ready[x].bot.id)
+        }
+      }
       if (timeout % 5 == 0) {
-        socket.emit('letgo', timeout)
         socket.broadcast.emit('reload')
         socket.emit('reload')
+      }
+      if (timeout == 10){
+        getBot()
       }
       if (timeout == 0) {
         if (list_play.length == 0) {
           clearInterval(countdown)
-          timeout = 20
+          timeout = 120
           setTimeout(beginPlay, 5000)
         }
         else {
           clearInterval(countdown)
           last_win = findIdWin()
-          updateCoinPlayer(last_win.id_player, last_win.coinWin, true)
+          // updateCoinPlayer(last_win.id_player, last_win.coinWin, true)
           socket.emit('sendLastWin', last_win)
           socket.broadcast.emit('sendLastWin', last_win)
-          timeout = 10
+          timeout = 120
           list_play = []
           totalCoin = 0
           countPlayerJoin = 0
@@ -146,24 +189,30 @@ io.on('connection', (socket) => {
             socket.emit('updateCoin')
             socket.broadcast.emit('updateCoin')
           }, 1000)
-          getBot()
+          caclHourPlay()
           setTimeout(beginPlay, 1000)
         }
       }
+      console.log('countdown', timeout)
     }, 1000)
   }
   if (begin == 0) {
     begin += 1
     setTimeout(async () => {
-      getBot()
+      await getBot()
+      caclHourPlay()
       beginPlay()
     }, 1000)
   }
   socket.on('updateChat', obj => {
     socket.broadcast.emit('sendMessage', obj)
   })
-  socket.on('updateLastWin',() => {
+  socket.on('updateLastWin', () => {
     socket.emit('sendLastWin', last_win)
+  })
+  //todo: active
+  socket.on('addBotCreate',ingame => {
+
   })
   socket.on('play', async obj => {
     let flag = false
@@ -172,7 +221,7 @@ io.on('connection', (socket) => {
     }
     countPlayerJoin += (flag == true ? 0 : 1)
     totalCoin += obj.coinJoin
-    updateCoinPlayer(obj.id_player, obj.coinJoin, false)
+    // updateCoinPlayer(obj.id_player, obj.coinJoin, false)
     setTimeout(() => {
       socket.emit('updateCoin')
     }, 1000)

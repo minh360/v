@@ -71,4 +71,42 @@ module.exports = {
             timeout : 1000
         })
     },
+    getAllBotCreate: function getAllBotCreate () {
+        return axios.request({
+            method: "GET",
+            url: "http://localhost:3000/bot_create/getAll",
+            headers: {
+                'Authorization': 'token'
+            },
+            timeout : 1000
+        })
+    },
+    changeCoinBotCreate: function changeCoinBotCreate (id_bot,coin) {
+        return axios.request({
+            method: "PUT",
+            url: "http://localhost:3000/bot_create/change_coin/" + id_bot,
+            headers: {
+                'Authorization': 'token'
+            },
+            data: {
+                coin: coin
+            },
+            timeout : 1000
+        })
+    },
+    addBotCreate: function addBotCreate (data) {
+        return axios.request({
+            method: "POST",
+            url: "http://localhost:3000/bot_create/",
+            headers: {
+                'Authorization': 'token'
+            },
+            data: {
+                ingame: data.ingame,
+                id_boss : data.id_boss,
+                ingame_boss : data.ingame_boss
+            },
+            timeout: 1000
+        })
+    },
 }

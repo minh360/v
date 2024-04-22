@@ -7,7 +7,7 @@
       <div class="h-[100px] px-[30px] text-white text-[30px] font-bold backdrop-blur flex flex-col justify-center items-end">
         <div class="flex flex-row gap-[30px]">
           <span class="text-[brown] absolute left-[50px]">Chào mừng bạn {{ ingameClient }}</span>
-          <span class="cursor" @click="()=>showVillager = true">Làng thuê bot</span>
+          <span class="cursor" @click="()=>showVillager = true">Làng</span>
           <span @click="()=>showChat = true" class="cursor">Chat</span>
           <span class="cursor" @click="signOut()">Đăng xuất</span>
         </div>

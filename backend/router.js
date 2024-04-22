@@ -2,7 +2,8 @@ const express = require("express");
 const router = new express.Router()
 const player_repository = require('./repositories/player_respository')
 const bot_repository = require('./repositories/bot_respostitory')
-const bot_create_repository = require('./repositories/bot_create_respostitory')
+const bot_create_repository = require('./repositories/bot_create_respostitory');
+const bot = require("./models/bot");
 //----------------------auth--------------------------
 router.post('/auth/sign_up', (req, res) => {
     const newPlayer = req.body;
@@ -49,6 +50,25 @@ router.put('/bot/change_coin/:id',(req, res) => {
     const { id } = req.params;
     const coin = req.body.coin;
     bot_repository.changeCoin(id,coin).then(bot => {
+        res.status(200).json(bot);
+    }).catch(error => console.log(error));
+});
+//-----------------------bot_create---------------------------------
+router.get('/bot_create/getAll', (req, res) => {
+    bot_create_repository.getAllBot().then(list => {
+        res.status(200).json(list);
+    }).catch(error => console.log(error));
+});
+router.put('/bot_create/change_coin/:id',(req, res) => {
+    const { id } = req.params;
+    const coin = req.body.coin;
+    bot_create_repository.changeCoin(id,coin).then(bot => {
+        res.status(200).json(bot);
+    }).catch(error => console.log(error));
+});
+router.put('/bot_create/', (req, res) => {
+    const data = req.body;
+    bot_create_repository.create(data).then(bot => {
         res.status(200).json(bot);
     }).catch(error => console.log(error));
 });

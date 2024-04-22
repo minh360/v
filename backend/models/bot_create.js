@@ -5,12 +5,5 @@ const botCreateSchema = new Schema({
     id_boss: String,
     ingame_boss: String,
     coin: Number,
-    status: Boolean,
-    status_join : Boolean,
-    second_join : Number,
-    coin_join : Number,
-    percent_join : Number,
-    coin_win : Number,
-    ingame_thue : String
 });
 module.exports = mongoose.model('bot_create', botCreateSchema);
