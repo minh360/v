@@ -13,7 +13,7 @@ mongoose.connect('mongodb+srv://minh231120012:setdanh113@cluster0.wuz4vl8.mongod
 const db = mongoose.connection;
 const router = require('./router')
 const dayjs = require("dayjs");
-const { changeCoinPlayer, getPlayer, getAllBot, changeCoinBot } = require('./api')
+const { changeCoinPlayer, getPlayer, getAllBot, changeCoinBot,addBotCreate } = require('./api')
 
 db.once('open', function () {
   console.log("Connected to MongoDB successfully!");
@@ -29,6 +29,14 @@ const io = require('socket.io')(server, {
     methods: ["GET", "POST", "PUT"]
   }
 });
+const STATUS = {
+  FREE : 0,
+  TRADE : 1,
+  BUSY : 2,
+  DONATE : 3,
+  SEND : 4,
+  SEND_WIN : 5
+}
 let last_win = {}
 let list_play = []
 let list_bot = []
@@ -39,6 +47,7 @@ let begin = 0
 let day = new Date(2023, 23, 1)
 let hours = []
 let list_ready = []
+let list_bot_create = []
 const calcAndFindPercent = id_player => {
   let percent_flag = 0
   let coinJoin = 0
@@ -148,6 +157,32 @@ const caclBotPlay = () => {
     list_ready.push({ bot, ...{ time: setTime }, ...{ coin : coin}})
   }
 }
+const getAllBotCreate = async () =>{
+  list_bot_create = []
+  await getAllBotCreate()
+    .then(async list => {
+      if (list){
+        const data = list.data
+        for (let i = 0; i < data.length; i++) {
+          list_bot_create.push({
+            id: data[i]._id,
+            ingame: data[i].ingame,
+            id_boss: data[i].id_boss,
+            ingame_boss: data[i].ingame_boss,
+            coin: data[i].coin,
+            status: STATUS.FREE,
+            staus_join: false,
+            second_join: 0,
+            coin_join: 0,
+            percent_join: 0,
+            coin_win:0,
+            ingame_thue: ''
+          })
+        }
+      }
+    })
+    .catch(err => console.log(err))
+}
 io.on('connection', (socket) => {
   const beginPlay = () => {
     const countdown = setInterval(() => {
@@ -210,9 +245,16 @@ io.on('connection', (socket) => {
   socket.on('updateLastWin', () => {
     socket.emit('sendLastWin', last_win)
   })
-  //todo: active
-  socket.on('addBotCreate',ingame => {
-
+  socket.on('addBotCreate', async data => {
+    await addBotCreate(data)
+      .then(async result => {
+        console.log('tạo bot thành công')
+        await getAllBotCreate()
+        //todo active
+        socket.broadcast.emit('updateListBotCreate',list_bot_create)
+        socket.emit('updateListBotCreate',list_bot_create)
+      })
+      .catch(err => console.log(err))
   })
   socket.on('play', async obj => {
     let flag = false
