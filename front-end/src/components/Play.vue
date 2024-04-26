@@ -47,9 +47,9 @@ const id_player = ref(sessionStorage.getItem('id_player'))
 
 const play = () =>{
     let regex = /^\d+$/
-    if(timeCountDownMilli.value <= 9000)
+    if(timeCountDownMilli.value <= 9)
         alert('Vxmm đã được khóa lúc 10s')
-    else if (coin.value - coinInput < 0)
+    else if (coin.value - coinInput.value < 0)
         alert('Số xu không đủ chơi')
     else if(!regex.test(coinInput.value))
         alert('Vui lòng nhập số đàng hoàng :)))')

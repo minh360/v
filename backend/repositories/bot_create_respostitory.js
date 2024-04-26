@@ -21,6 +21,9 @@ class BotCreateRepository {
     getById(id){
         return this.model.findById(id)
     }
+    checkExist(ingame){
+        return this.model.findOne({ingame: ingame})
+    }
     changeCoin (id,coin){
         const query = { _id: id };
         return this.model.findOneAndUpdate(query, { $set: { coin: coin} });

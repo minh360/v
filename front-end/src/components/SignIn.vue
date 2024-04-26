@@ -28,7 +28,7 @@
 </template>
 <script setup>
 import {ref} from 'vue'
-import { checkExist } from '../../../backend/api';
+import { getInforPlayer } from '../../../backend/api';
 import { socket } from '@/main';
 const ingame = ref('')
 const password = ref('')
@@ -48,8 +48,9 @@ const checkError = () => {
 const signIn = async () => {
   checkError()
   if(message.value === ''){
-    await checkExist(ingame.value)
+    await getInforPlayer(ingame.value)
         .then(player => {
+          console.log(player)
           message.value = 'Đăng nhập thành công tài khoản '+ ingame.value
           sessionStorage.setItem('id_player',player.data._id)
           sessionStorage.setItem('ingame_client',player.data.ingame)

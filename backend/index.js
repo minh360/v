@@ -13,7 +13,7 @@ mongoose.connect('mongodb+srv://minh231120012:setdanh113@cluster0.wuz4vl8.mongod
 const db = mongoose.connection;
 const router = require('./router')
 const dayjs = require("dayjs");
-const { changeCoinPlayer, getPlayer, getAllBot, changeCoinBot,addBotCreate } = require('./api')
+const { changeCoinPlayer, getPlayer, getAllBot, getAllBotCreate, changeCoinBot,addBotCreate } = require('./api')
 
 db.once('open', function () {
   console.log("Connected to MongoDB successfully!");
@@ -157,11 +157,11 @@ const caclBotPlay = () => {
     list_ready.push({ bot, ...{ time: setTime }, ...{ coin : coin}})
   }
 }
-const getAllBotCreate = async () =>{
+const getBotCreate = async () =>{
   list_bot_create = []
   await getAllBotCreate()
     .then(async list => {
-      if (list){
+      if (list.data != []){
         const data = list.data
         for (let i = 0; i < data.length; i++) {
           list_bot_create.push({
@@ -236,11 +236,13 @@ io.on('connection', (socket) => {
     setTimeout(async () => {
       await getBot()
       caclHourPlay()
+      await getBotCreate()
       beginPlay()
     }, 1000)
   }
   socket.on('updateChat', obj => {
     socket.broadcast.emit('sendMessage', obj)
+    socket.emit('sendMessage', obj)
   })
   socket.on('updateLastWin', () => {
     socket.emit('sendLastWin', last_win)
@@ -249,12 +251,27 @@ io.on('connection', (socket) => {
     await addBotCreate(data)
       .then(async result => {
         console.log('tạo bot thành công')
-        await getAllBotCreate()
-        //todo active
+        list_bot_create.push({
+          id: result.data._id,
+            ingame: result.data.ingame,
+            id_boss: result.data.id_boss,
+            ingame_boss: result.data.ingame_boss,
+            coin: 0,
+            status: STATUS.FREE,
+            staus_join: false,
+            second_join: 0,
+            coin_join: 0,
+            percent_join: 0,
+            coin_win:0,
+            ingame_thue: ''
+        })
         socket.broadcast.emit('updateListBotCreate',list_bot_create)
         socket.emit('updateListBotCreate',list_bot_create)
       })
       .catch(err => console.log(err))
+  })
+  socket.on('loadListBotCreate',() => {
+    socket.emit('updateListBotCreate',list_bot_create)
   })
   socket.on('play', async obj => {
     let flag = false

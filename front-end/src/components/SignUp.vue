@@ -50,12 +50,11 @@ const signUp = async () => {
     let player_exist
     await checkExist(ingame.value)
         .then(result =>{
-          player_exist = result.data
+          message.value = result ? 'Ingame đã tồn tại' : ''
         })
         .catch(err =>
             console.log(err.response.data)
         );
-        message.value = player_exist ? 'Ingame đã tồn tại' : ''
     if(!player_exist){
       await addNewAccount(ingame.value,password.value)
         .then(result =>{

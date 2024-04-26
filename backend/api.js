@@ -10,8 +10,20 @@ module.exports = {
             timeout: 1000
         })
     },
-    checkExist: async function checkExist (ingame) {
+    getInforPlayer: async function getInforPlayer (ingame) {
         return await axios.request({
+            method: "POST",
+            url: "http://localhost:3000/auth/sign_in",
+            headers: {
+                'Authorization': 'token'
+            },
+            data: {ingame: ingame},
+            timeout: 1000
+        })
+    },
+    checkExist: async function checkExist (ingame) {
+        let flag = false
+        await axios.request({
             method: "POST",
             url: "http://localhost:3000/auth/sign_up/check",
             headers: {
@@ -20,6 +32,42 @@ module.exports = {
             data: {ingame: ingame},
             timeout: 1000
         })
+        .then(data => {
+            if (data.data){
+                flag = true
+            }
+        })
+        console.log(3)
+        await axios.request({
+            method: "POST",
+            url: "http://localhost:3000/bot/check",
+            headers: {
+                'Authorization': 'token'
+            },
+            data: {ingame: ingame},
+            timeout: 1000
+        })
+        .then(data => {
+            if (data.data){
+                flag = true
+            }
+        })
+        console.log(4)
+        await axios.request({
+            method: "POST",
+            url: "http://localhost:3000/bot_create/check",
+            headers: {
+                'Authorization': 'token'
+            },
+            data: {ingame: ingame},
+            timeout: 1000
+        })
+        .then(data => {
+            if (data.data){
+                flag = true
+            }
+        })
+        return flag
     },
     addNewAccount: function addNewAccount (ingame,password) {
         return axios.request({
@@ -96,7 +144,7 @@ module.exports = {
     },
     addBotCreate: function addBotCreate (data) {
         return axios.request({
-            method: "POST",
+            method: "PUT",
             url: "http://localhost:3000/bot_create/",
             headers: {
                 'Authorization': 'token'
