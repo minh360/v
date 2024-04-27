@@ -37,7 +37,6 @@ module.exports = {
                 flag = true
             }
         })
-        console.log(3)
         await axios.request({
             method: "POST",
             url: "http://localhost:3000/bot/check",
@@ -52,7 +51,6 @@ module.exports = {
                 flag = true
             }
         })
-        console.log(4)
         await axios.request({
             method: "POST",
             url: "http://localhost:3000/bot_create/check",
