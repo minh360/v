@@ -134,7 +134,7 @@ onMounted(async ()=>{
                 <div>Số coin tham gia: {{ lastCoinJoin ? format(lastCoinJoin) : 'Chưa có thông tin'}}</div>
             </div>
             <div class="flex flex-row gap-[20px]">
-                <input type="number" class="pl-[20px] w-[500px] rounded h-[50px]" 
+                <input type="number" class="pl-[20px] w-[200px] rounded h-[50px]" 
                 v-if="isInputed" v-model="coinInput" placeholder="Tham gia từ 1tr đến 50tr"
                 v-on:keyup.enter="play()"/>
 

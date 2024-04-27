@@ -8,30 +8,21 @@
         <div class="flex flex-col items-center w-full gap-[50px] my-[50px]">
           <input type="text" class="w-[50%] border-1 border px-[10px] rounded h-[40px]" v-model="fake.ingame"
             placeholder="Tên bot" />
-            <div class="text-[15px] cursor absolute top-[10px] right-0 px-[20px]" @click="deleteCreateBot(index)">X</div>
-          <button @click="createBot2(fake.ingame,index)" class="w-[30%]">Tạo bot</button>
+          <div class="text-[15px] cursor absolute top-[10px] right-0 px-[20px]" @click="deleteCreateBot(index)">X</div>
+          <button @click="createBot2(fake.ingame, index)" class="w-[30%]">Tạo bot</button>
         </div>
       </div>
       <div class="rounded-[10px] h-[200px] bg-[white] relative" v-for="(bot, zin) in list_bot" :key="zin">
 
         <div class="text-center font-bold text-[red] text-[25px]">{{ bot.ingame }}</div>
-        
-        <div class="text-[15px] cursor absolute top-[10px] right-0 px-[20px]" v-if="bot.coin == 0 && bot.status == STATUS.FREE">X</div>
 
         <div class="flex flex-col items-center w-full gap-[10px]" v-if="bot.status == STATUS.FREE">
-          <div>{{ format(bot.coin) }} xu</div>
+          <div v-if="bot.id_boss == id_player">{{ format(bot.coin) }} xu</div>
           <div class="flex flex-row gap-[5px]">
-            <button @click="changeStatus(STATUS.TRADE,zin)" class="px-[10px]">Đặt</button>
-            <button @click="changeStatus(STATUS.DONATE,zin)" class="px-[10px]" v-if="bot.id_boss == id_player">Nạp</button>
-            <button @click="changeStatus(STATUS.SEND,zin)" class="px-[10px]" v-if="bot.id_boss == id_player">Rút</button>
+            <button @click="changeStatus(STATUS.TRADE, zin)" class="px-[10px]">Đặt</button>
+            <button @click="changeStatus(STATUS.SEND, zin)" class="px-[10px]"
+              v-if="bot.id_boss == id_player && bot.coin != 0">Rút</button>
           </div>
-        </div>
-
-        <div class="flex flex-col items-center justify-center mt-[10px] h-full w-full gap-[10px]"
-          v-if="bot.status == STATUS.DONATE">
-          <input type="number" class="w-[50%] border-1 border px-[10px] rounded h-[40px]" v-model="coinDonate"
-            placeholder="Số xu" v-on:keyup.enter="donate(zin)" />
-          <button @click="donate(zin)" class="w-[30%]">Nạp xu</button>
         </div>
 
         <div class="flex flex-col items-center justify-center mt-[10px] h-full w-full gap-[10px]"
@@ -63,31 +54,26 @@
           }} %</p>
         </div>
 
-        <div class="font-bold text-[30px] mt-[50px]"
-          v-if="bot.status == STATUS.TRADE && bot.id_thue != id_player">
+        <div class="font-bold text-[30px] mt-[50px]" v-if="bot.status == STATUS.TRADE && bot.id_thue != id_player">
           Đang giao dịch ...
         </div>
 
-        <div class="font-bold text-[30px] mt-[50px]"
-          v-if="bot.status == STATUS.SEND_WIN && bot.id_thue != id_player">
+        <div class="font-bold text-[30px] mt-[50px]" v-if="bot.status == STATUS.SEND_WIN && bot.id_thue != id_player">
           Đang giao xu win . . .
         </div>
 
-        <div class="font-bold text-[30px] mt-[50px]"
-          v-if="bot.id_thue != id_player && bot.status == STATUS.BUSY">
+        <div class="font-bold text-[30px] mt-[50px]" v-if="bot.id_thue != id_player && bot.status == STATUS.BUSY">
           Đã có khách thuê ạ
         </div>
 
         <div class="flex flex-col items-center px-[20px] font-bold w-full h-[50%] gap-[10px]"
           v-if="bot.status == STATUS.SEND_WIN && bot.id_thue == id_player">
-          <div v-if="bot.ingame == lastPlayerWin">
             <p class="text-[green]">Đã win rồi hãy giao dịch để lấy xu</p>
             <p>Win : {{ format(lastCoinWin) }} xu</p>
             <div class="flex flex-row justify-around w-full mt-[20px]">
               <button class="w-[50%]" @click="sendWin(zin)">Giao dịch</button>
               <button class="w-[40%]" v-if="bot.id_boss == bot.id_thue" @click="keepCoin(zin)">Giữ xu</button>
             </div>
-          </div>
         </div>
 
       </div>
@@ -101,24 +87,23 @@
 import { socket } from '@/main';
 import { STATUS } from '@/share';
 import { ref, defineEmits, onMounted } from 'vue';
-import { checkExist } from '../../../backend/api';
+import { checkExist,getPlayer } from '../../../backend/api';
 const lastPlayerWin = ref('')
 const lastCoinWin = ref('')
 const list_fake = ref([])
-const coinDonate = ref('')
 const coinSend = ref('')
 const emits = defineEmits('oncloseVillager')
 const id_player = ref(sessionStorage.getItem('id_player'))
 const ingameClient = ref(sessionStorage.getItem('ingame_client'))
 const list_bot = ref([])
-const deleteCreateBot = index =>{
-  list_fake.value.splice(index,1)
+const deleteCreateBot = index => {
+  list_fake.value.splice(index, 1)
 }
 const createBot1 = () => {
   list_fake.value.unshift({ ingame: '', mode: true })
 }
 
-const createBot2 = async (ingame,index) => {
+const createBot2 = async (ingame, index) => {
   await checkExist(ingame)
     .then(result => {
       if (!result) {
@@ -135,28 +120,44 @@ const createBot2 = async (ingame,index) => {
 
 }
 
-const changeStatus = (status,index) =>{
-  socket.emit('changeStatus',{status : status,index : index,id_thue : id_player.value})
+const changeStatus = (status, index) => {
+  socket.emit('changeStatus', { status: status, index: index, id_thue: id_player.value })
 }
-const donate = index =>{
-  socket.emit('donate',{coin : coinDonate.value,index : index})
-  coinDonate.value = ''
+const send = index => {
+  if (coinSend.value > list_bot.value[index].coin) {
+    socket.emit('send', { coin: coinSend.value, index: index })
+    coinSend.value = ''
+  }
+  else alert('Xu không đủ boss ơi')
+
 }
-const send = index =>{
-  socket.emit('send',{coin : coinSend.value,index : index})
-  coinSend.value = ''
+const play = async index => {
+  if (list_bot.value[index].time_join < 10 || list_bot.value[index].time_join > 120) {
+    alert('Thời gian từ 11 đến 120 bạn ơi')
+  }
+  else if (list_bot.value[index].coin_join > 50000000 || list_bot.value[index].coin_join < 1000000) {
+    alert('Đặt từ 1tr đến 50tr bạn ơi')
+  }
+  else {
+    await getPlayer(list_bot.value[index].id_thue)
+      .then(result => {
+        if (list_bot.value[index].coin_join > result.data.coin) {
+          alert('Không đủ xu mà đòi chơi')
+        }
+        else {
+          list_bot.value[index].coin += Number(list_bot.value[index].coin_join)
+          list_bot.value[index].status = STATUS.BUSY
+          list_bot.value[index].id_thue = id_player.value
+          socket.emit('playBot', { list: list_bot.value, index: index })
+        }
+      })
+  }
 }
-const play = index => {
-  list_bot.value[index].coin += Number(list_bot.value[index].coin_join)
-  list_bot.value[index].status = STATUS.BUSY
-  list_bot.value[index].id_thue = id_player.value
-  socket.emit('playBot',{list : list_bot.value,index: index})
+const keepCoin = index => {
+  socket.emit('keepCoin', { coin: lastCoinWin.value, index: index })
 }
-const keepCoin = index =>{
-  socket.emit('keepCoin',{coin :lastCoinWin.value,index: index })
-}
-const sendWin = index =>{
-  socket.emit('sendWin',{coin: lastCoinWin.value,index: index })
+const sendWin = index => {
+  socket.emit('sendWin', { coin: lastCoinWin.value, index: index })
 }
 socket.on('updateListBotCreate', list => {
   list_bot.value = list
