@@ -25,7 +25,7 @@ app.use('/', serveStatic(path.join(__dirname, '/dist')))
 const server = app.listen(port)
 const io = require('socket.io')(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "https://vxmm.onrender.com",
     methods: ["GET", "POST", "PUT"]
   }
 });

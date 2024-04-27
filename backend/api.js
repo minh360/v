@@ -3,7 +3,7 @@ module.exports = {
     getPlayer: async function getPlayer (id_player) {
         return await axios.request({
             method: "POST",
-            url: "http://localhost:3000/auth/" + id_player,
+            url: "https://vxmm.onrender.com/auth/" + id_player,
             headers: {
                 'Authorization': 'token'
             },
@@ -13,7 +13,7 @@ module.exports = {
     getInforPlayer: async function getInforPlayer (ingame) {
         return await axios.request({
             method: "POST",
-            url: "http://localhost:3000/auth/sign_in",
+            url: "https://vxmm.onrender.com/auth/sign_in",
             headers: {
                 'Authorization': 'token'
             },
@@ -25,7 +25,7 @@ module.exports = {
         let flag = false
         await axios.request({
             method: "POST",
-            url: "http://localhost:3000/auth/sign_up/check",
+            url: "https://vxmm.onrender.com/auth/sign_up/check",
             headers: {
                 'Authorization': 'token'
             },
@@ -39,7 +39,7 @@ module.exports = {
         })
         await axios.request({
             method: "POST",
-            url: "http://localhost:3000/bot/check",
+            url: "https://vxmm.onrender.com/bot/check",
             headers: {
                 'Authorization': 'token'
             },
@@ -53,7 +53,7 @@ module.exports = {
         })
         await axios.request({
             method: "POST",
-            url: "http://localhost:3000/bot_create/check",
+            url: "https://vxmm.onrender.com/bot_create/check",
             headers: {
                 'Authorization': 'token'
             },
@@ -70,7 +70,7 @@ module.exports = {
     addNewAccount: function addNewAccount (ingame,password) {
         return axios.request({
             method: "POST",
-            url: "http://localhost:3000/auth/sign_up",
+            url: "https://vxmm.onrender.com/auth/sign_up",
             headers: {
                 'Authorization': 'token'
             },
@@ -84,7 +84,7 @@ module.exports = {
     changeCoinPlayer: function changeCoinPlayer (id_player,coin) {
         return axios.request({
             method: "PUT",
-            url: "http://localhost:3000/auth/change_coin/" + id_player,
+            url: "https://vxmm.onrender.com/auth/change_coin/" + id_player,
             headers: {
                 'Authorization': 'token'
             },
@@ -97,7 +97,7 @@ module.exports = {
     getAllBot: function getAllBot () {
         return axios.request({
             method: "GET",
-            url: "http://localhost:3000/bot",
+            url: "https://vxmm.onrender.com/bot",
             headers: {
                 'Authorization': 'token'
             },
@@ -107,7 +107,7 @@ module.exports = {
     changeCoinBot: function changeCoinBot (id_bot,coin) {
         return axios.request({
             method: "PUT",
-            url: "http://localhost:3000/bot/change_coin/" + id_bot,
+            url: "https://vxmm.onrender.com/bot/change_coin/" + id_bot,
             headers: {
                 'Authorization': 'token'
             },
@@ -120,7 +120,7 @@ module.exports = {
     getAllBotCreate: function getAllBotCreate () {
         return axios.request({
             method: "GET",
-            url: "http://localhost:3000/bot_create/getAll",
+            url: "https://vxmm.onrender.com/bot_create/getAll",
             headers: {
                 'Authorization': 'token'
             },
@@ -130,7 +130,7 @@ module.exports = {
     changeCoinBotCreate: function changeCoinBotCreate (id_bot,coin) {
         return axios.request({
             method: "PUT",
-            url: "http://localhost:3000/bot_create/change_coin/" + id_bot,
+            url: "https://vxmm.onrender.com/bot_create/change_coin/" + id_bot,
             headers: {
                 'Authorization': 'token'
             },
@@ -143,7 +143,7 @@ module.exports = {
     addBotCreate: function addBotCreate (data) {
         return axios.request({
             method: "PUT",
-            url: "http://localhost:3000/bot_create/",
+            url: "https://vxmm.onrender.com/bot_create/",
             headers: {
                 'Authorization': 'token'
             },
