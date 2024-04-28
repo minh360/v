@@ -25,7 +25,7 @@
           :lastCoinWin = lastCoinWin
           :lastPlayerWin = lastPlayerWin
           :id_player = id_player
-          
+          :ingame = bot.ingame
       />
     </div>
     <div>

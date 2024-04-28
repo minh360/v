@@ -83,6 +83,7 @@ const bot = defineProps({
   lastCoinWin: String,
   lastPlayerWin: String,
   id_player: String,
+  ingame: String
 })
 const coinSend = ref('')
 const format = number => {
@@ -124,7 +125,7 @@ const play = async index => {
           bot.coin += Number(bot.coin_join)
           bot.status = STATUS.BUSY
           bot.id_thue = bot.id_player
-          socket.emit('playBot', { list: list_bot.value, index: index })
+          socket.emit('playBot', { item: bot, index: index })
         }
       })
   }
@@ -136,3 +137,13 @@ const sendWin = index => {
   socket.emit('sendWin', { coin: bot.lastCoinWin, index: index })
 }
 </script>
+<style lang="scss" scoped>
+button {
+  border-radius: 10px;
+  background-color: bisque;
+  color: darkred;
+  font-weight: 700;
+  padding: 20 20px;
+  height: 45px;
+}
+</style>

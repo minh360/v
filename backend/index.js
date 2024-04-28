@@ -367,7 +367,11 @@ io.on('connection', (socket) => {
     socket.emit('updateCoin')
   })
   socket.on('playBot', async data => {
-    list_bot_create = data.list
+    list_bot_create[data.index].coin = data.item.coin
+    list_bot_create[data.index].status = data.item.status
+    list_bot_create[data.index].id_thue = data.item.id_thue
+    list_bot_create[data.index].time_join = data.item.time_join
+    list_bot_create[data.index].coin_join = data.item.coin_join
     await updateCoinPlayer(list_bot_create[data.index].id_thue, list_bot_create[data.index].coin_join, false)
     socket.broadcast.emit('updateListBotCreate', list_bot_create)
     socket.emit('updateListBotCreate', list_bot_create)
