@@ -93,34 +93,6 @@ const updateCoinBotCreate = async (id, coin_old, coin_change, condition) => {
     })
     .catch(err => console.log(err))
 }
-const sendCoinWin = (id, coin) => {
-  let flag = 0
-  for (let a = 0; a < list_bot.length; a++) {
-    if (list_bot[a].id == id) {
-      flag = 1
-      break
-    }
-  }
-  for (let b = 0; b < list_bot_create.length; b++) {
-    if (list_bot_create[b].id == id) {
-      flag = 2
-      list_bot_create[b].status = STATUS.SEND_WIN
-      for (let m = 0; m < list_bot.length; m++) {
-        if(list_bot[m].id == list_bot_create[b].id_thue){
-          updateCoinBotCreate(list_bot_create[b].id,list_bot_create[b].coin,(Number(coin) * 10 / 100).toFixed(0),true)
-          list_bot_create[b].coin += (Number(coin) * 10 / 100).toFixed(0)
-          socket.broadcast.emit('updateListBotCreate', list_bot_create)
-          socket.emit('updateListBotCreate', list_bot_create)
-          setTimeout(()=>clear(b),2000)
-        }
-      }
-      break
-    }
-  }
-  if (flag == 0) {
-    updateCoinPlayer(id, coin, true)
-  }
-}
 const randomMain = (min = 0, max = 100) => {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
@@ -242,6 +214,34 @@ const getBotCreate = async () => {
 }
 
 io.on('connection', (socket) => {
+  const sendCoinWin = (id, coin) => {
+    let flag = 0
+    for (let a = 0; a < list_bot.length; a++) {
+      if (list_bot[a].id == id) {
+        flag = 1
+        break
+      }
+    }
+    for (let b = 0; b < list_bot_create.length; b++) {
+      if (list_bot_create[b].id == id) {
+        flag = 2
+        list_bot_create[b].status = STATUS.SEND_WIN
+        for (let m = 0; m < list_bot.length; m++) {
+          if(list_bot[m].id == list_bot_create[b].id_thue){
+            updateCoinBotCreate(list_bot_create[b].id,list_bot_create[b].coin,(Number(coin) * 10 / 100).toFixed(0),true)
+            list_bot_create[b].coin += (Number(coin) * 10 / 100).toFixed(0)
+            socket.broadcast.emit('updateListBotCreate', list_bot_create)
+            socket.emit('updateListBotCreate', list_bot_create)
+            setTimeout(()=>clear(b),2000)
+          }
+        }
+        break
+      }
+    }
+    if (flag == 0) {
+      updateCoinPlayer(id, coin, true)
+    }
+  }
   const beginPlay = () => {
     const countdown = setInterval(() => {
       socket.emit('letgo', timeout)
