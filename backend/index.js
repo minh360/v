@@ -341,7 +341,6 @@ io.on('connection', (socket) => {
           setTimeout(beginPlay, 1000)
         }
       }
-      console.log('countdown', timeout)
     }, 1000)
   }
   if (begin == 0) {
