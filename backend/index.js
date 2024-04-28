@@ -142,7 +142,7 @@ const findIdWin = () => {
   }
 }
 const caclBotThue = id =>{
-  if (randomMain(0,99) <= 20){
+  if (randomMain(0,99) <= 99){
     const time = randomMain(16,110)
     // set always lower then 60
     const coin = caclBotJoin(10)
