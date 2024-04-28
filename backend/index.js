@@ -258,9 +258,6 @@ io.on('connection', (socket) => {
             socket.emit('updateListBotCreate', list_bot_create)
           },5000)
         }
-        else{
-          list_thue.splice(z,1)
-        }
       }
       for (let x = 0; x < list_ready.length; x++) {
         if (list_ready[x].time == timeout) {
