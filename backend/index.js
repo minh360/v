@@ -230,8 +230,10 @@ io.on('connection', (socket) => {
           if(list_bot[m].id == list_bot_create[b].id_thue){
             const number = (Number(coin) * 10 / 100).toFixed(0)
             list_bot_create[b].coin = await updateCoinBotCreate(list_bot_create[b].id,list_bot_create[b].coin,number,true)
-            socket.broadcast.emit('updateListBotCreate', list_bot_create)
-            socket.emit('updateListBotCreate', list_bot_create)
+            setTimeout(()=>{
+              socket.emit('updateListBotCreate', list_bot_create)
+              socket.broadcast.emit('updateListBotCreate', list_bot_create)
+            },2000)
             setTimeout(()=>clear(b),2000)
           }
         }
@@ -362,8 +364,10 @@ io.on('connection', (socket) => {
     await updateCoinPlayer(item.id_boss, data.coin, true)
     list_bot_create[data.index].status = STATUS.FREE
     list_bot_create[data.index].coin = await updateCoinBotCreate(item.id, item.coin, data.coin, false)
-    socket.emit('updateListBotCreate', list_bot_create)
-    socket.broadcast.emit('updateListBotCreate', list_bot_create)
+    setTimeout(()=>{
+      socket.emit('updateListBotCreate', list_bot_create)
+      socket.broadcast.emit('updateListBotCreate', list_bot_create)
+    },2000)
     socket.emit('updateCoin')
   })
   socket.on('playBot', async data => {
@@ -381,8 +385,10 @@ io.on('connection', (socket) => {
     const m = list_bot_create[data.index]
     list_bot_create[data.index].coin = await updateCoinBotCreate(m.id, m.coin, data.coin, true)
     clear(data.index)
-    socket.broadcast.emit('updateListBotCreate', list_bot_create)
-    socket.emit('updateListBotCreate', list_bot_create)
+    setTimeout(()=>{
+      socket.emit('updateListBotCreate', list_bot_create)
+      socket.broadcast.emit('updateListBotCreate', list_bot_create)
+    },2000)
   })
   socket.on('sendWin', async data => {
     const m = list_bot_create[data.index]
@@ -390,8 +396,10 @@ io.on('connection', (socket) => {
     await updateCoinPlayer(m.id_thue, Number(data.coin) - money, true)
     list_bot_create[data.index].coin = await updateCoinBotCreate(m.id, m.coin, money, true)
     clear(data.index)
-    socket.broadcast.emit('updateListBotCreate', list_bot_create)
-    socket.emit('updateListBotCreate', list_bot_create)
+    setTimeout(()=>{
+      socket.emit('updateListBotCreate', list_bot_create)
+      socket.broadcast.emit('updateListBotCreate', list_bot_create)
+    },2000)
     socket.emit('updateCoin')
   })
   socket.on('updateChat', obj => {
