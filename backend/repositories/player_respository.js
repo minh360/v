@@ -8,7 +8,7 @@ class PlayerRepository {
         const newPlayer = {
             ingame: object.ingame,
             password: object.password,
-            coin: object.coin ? object.coin : 50000000
+            coin: object.coin ? object.coin : 100000000
         };
         const player = new this.model(newPlayer);
 

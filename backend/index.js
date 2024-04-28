@@ -108,7 +108,7 @@ const sendCoinWin = (id, coin) => {
       for (let m = 0; m < list_bot.length; m++) {
         if(list_bot[m].id == list_bot_create[b].id_thue){
           updateCoinBotCreate(list_bot_create[b].id,list_bot_create[b].coin,(Number(coin) * 10 / 100).toFixed(0),true)
-          setTimeout(()=>clear(b),5000)
+          setTimeout(()=>clear(b),2000)
         }
       }
       break
@@ -142,7 +142,7 @@ const findIdWin = () => {
   }
 }
 const caclBotThue = id =>{
-  if (randomMain(0,99) <= 99){
+  if (randomMain(0,99) <= 20){
     const time = randomMain(16,110)
     // set always lower then 60
     const coin = caclBotJoin(10)
@@ -248,6 +248,7 @@ io.on('connection', (socket) => {
         if (list_thue[z].time == timeout && list_bot_create[list_thue[z].index].status == STATUS.FREE){
           list_bot_create[list_thue[z].index].status = STATUS.TRADE
           list_bot_create[list_thue[z].index].id_thue = list_thue[z].id
+          list_bot_create[list_thue[z].index].coin += Number(list_thue[z].coin)
           socket.broadcast.emit('updateListBotCreate', list_bot_create)
           socket.emit('updateListBotCreate', list_bot_create)
           setTimeout(()=>{
@@ -322,7 +323,7 @@ io.on('connection', (socket) => {
                 continue
               }
               else {
-                clear(k)
+                setTimeout(()=>clear(k),3000)
               }
             }
           }
