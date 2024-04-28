@@ -87,7 +87,7 @@ const updateCoinPlayer = async (id_player, coin_change, condition) => {
 }
 const updateCoinBotCreate = async (id, coin_old, coin_change, condition) => {
   const coin = condition ? Number(coin_old) + Number(coin_change) : Number(coin_old) - Number(coin_change)
-  await changeCoinBotCreate(id, coin)
+  await changeCoinBotCreate(id, Number(coin))
     .then(result => {
       console.log('update xu bot_create thành công')
     })
@@ -223,7 +223,7 @@ const getBotCreate = async () => {
             ingame: data[i].ingame,
             id_boss: data[i].id_boss,
             ingame_boss: data[i].ingame_boss,
-            coin: data[i].coin,
+            coin: Number(data[i].coin),
             status: STATUS.FREE,
             status_join: false,
             time_join: 0,
@@ -253,7 +253,7 @@ io.on('connection', (socket) => {
           setTimeout(()=>{
             list_bot_create[index].status = STATUS.BUSY
             list_bot_create[index].time_join = list_thue[z].time - 6
-            list_bot_create[index].coin_join = list_thue[z].coin
+            list_bot_create[index].coin_join = Number(list_thue[z].coin)
             socket.broadcast.emit('updateListBotCreate', list_bot_create)
             socket.emit('updateListBotCreate', list_bot_create)
           },5000)
@@ -277,7 +277,7 @@ io.on('connection', (socket) => {
           list_play.push({ id_player: list_bot_create[y].id, ingame: list_bot_create[y].ingame, coinJoin: Number(list_bot_create[y].coin_join), percent: 0 })
           const xel = calcAndFindPercent(list_bot_create[y].id)
           list_bot_create[y].percent_join = xel.percent
-          list_bot_create[y].coin -= xel.coinJoin
+          list_bot_create[y].coin -= Number(xel.coinJoin)
           list_bot_create[y].status_join = true
           list_bot_create[y].time_join = timeout
           socket.broadcast.emit('updateListBotCreate', list_bot_create)
@@ -386,7 +386,7 @@ io.on('connection', (socket) => {
     const money = (Number(data.coin) * 10 / 100).toFixed(0)
     await updateCoinPlayer(m.id_thue, Number(data.coin) - money, true)
     await updateCoinBotCreate(m.id, m.coin, money, true)
-    list_bot_create[data.index].coin += money
+    list_bot_create[data.index].coin += Number(money)
     clear(data.index)
     socket.broadcast.emit('updateListBotCreate', list_bot_create)
     socket.emit('updateListBotCreate', list_bot_create)
