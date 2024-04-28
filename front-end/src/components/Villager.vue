@@ -12,7 +12,7 @@
           <button @click="createBot2(fake.ingame, index)" class="w-[30%]">Tạo bot</button>
         </div>
       </div>
-      <Bot v-for="(bot, zin) in list_bot" :key="zin" 
+      <Bot v-for="(bot, zin) in list_bot" :key="bot" 
           :zin = zin 
           :status = bot.status
           :id_boss = bot.id_boss
@@ -67,7 +67,6 @@ const createBot2 = async (ingame, index) => {
       }
       else alert('Ingame đã tồn tại')
     })
-
 }
 
 socket.on('updateListBotCreate', list => {
