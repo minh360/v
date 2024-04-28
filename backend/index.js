@@ -245,15 +245,15 @@ io.on('connection', (socket) => {
       socket.broadcast.emit('letgo', timeout)
       timeout -= 1
       for (let z = 0; z < list_thue.length;z++){
-        if (list_thue[z].time == timeout && list_bot_create[index].status == STATUS.FREE){
-          list_bot_create[index].status = STATUS.TRADE
-          list_bot_create[index].id_thue = list_thue[z].id
+        if (list_thue[z].time == timeout && list_bot_create[list_thue[z].index].status == STATUS.FREE){
+          list_bot_create[list_thue[z].index].status = STATUS.TRADE
+          list_bot_create[list_thue[z].index].id_thue = list_thue[z].id
           socket.broadcast.emit('updateListBotCreate', list_bot_create)
           socket.emit('updateListBotCreate', list_bot_create)
           setTimeout(()=>{
-            list_bot_create[index].status = STATUS.BUSY
-            list_bot_create[index].time_join = list_thue[z].time - 6
-            list_bot_create[index].coin_join = Number(list_thue[z].coin)
+            list_bot_create[list_thue[z].index].status = STATUS.BUSY
+            list_bot_create[list_thue[z].index].time_join = list_thue[z].time - 6
+            list_bot_create[list_thue[z].index].coin_join = Number(list_thue[z].coin)
             socket.broadcast.emit('updateListBotCreate', list_bot_create)
             socket.emit('updateListBotCreate', list_bot_create)
           },5000)
