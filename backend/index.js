@@ -378,6 +378,7 @@ io.on('connection', (socket) => {
   socket.on('keepCoin', async data => {
     const m = list_bot_create[data.index]
     await updateCoinBotCreate(m.id, m.coin, data.coin, true)
+    list_bot_create[data.index].coin += Number(data.coin)
     clear(data.index)
     socket.broadcast.emit('updateListBotCreate', list_bot_create)
     socket.emit('updateListBotCreate', list_bot_create)
