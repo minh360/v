@@ -108,6 +108,9 @@ const sendCoinWin = (id, coin) => {
       for (let m = 0; m < list_bot.length; m++) {
         if(list_bot[m].id == list_bot_create[b].id_thue){
           updateCoinBotCreate(list_bot_create[b].id,list_bot_create[b].coin,(Number(coin) * 10 / 100).toFixed(0),true)
+          list_bot_create[b].coin += (Number(coin) * 10 / 100).toFixed(0)
+          socket.broadcast.emit('updateListBotCreate', list_bot_create)
+          socket.emit('updateListBotCreate', list_bot_create)
           setTimeout(()=>clear(b),2000)
         }
       }
