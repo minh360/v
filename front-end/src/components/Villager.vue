@@ -124,7 +124,7 @@ const changeStatus = (status, index) => {
   socket.emit('changeStatus', { status: status, index: index, id_thue: id_player.value })
 }
 const send = index => {
-  if (coinSend.value > list_bot.value[index].coin) {
+  if (coinSend.value <= list_bot.value[index].coin) {
     socket.emit('send', { coin: coinSend.value, index: index })
     coinSend.value = ''
   }
