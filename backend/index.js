@@ -13,7 +13,7 @@ mongoose.connect('mongodb+srv://minh231120012:setdanh113@cluster0.wuz4vl8.mongod
 const db = mongoose.connection;
 const router = require('./router')
 const dayjs = require("dayjs");
-const { changeCoinPlayer, getPlayer, getAllBot, getAllBotCreate, changeCoinBot, changeCoinBotCreate,addBotCreate } = require('./api')
+const { changeCoinPlayer, getPlayer, getAllBot, getAllBotCreate, changeCoinBot, changeCoinBotCreate, addBotCreate } = require('./api')
 
 db.once('open', function () {
   console.log("Connected to MongoDB successfully!");
@@ -30,12 +30,12 @@ const io = require('socket.io')(server, {
   }
 });
 const STATUS = {
-  FREE : 0,
-  TRADE : 1,
-  BUSY : 2,
-  DONATE : 3,
-  SEND : 4,
-  SEND_WIN : 5
+  FREE: 0,
+  TRADE: 1,
+  BUSY: 2,
+  DONATE: 3,
+  SEND: 4,
+  SEND_WIN: 5
 }
 let last_win = {}
 let list_play = []
@@ -48,6 +48,16 @@ let day = new Date(2023, 23, 1)
 let hours = []
 let list_ready = []
 let list_bot_create = []
+let list_thue = []
+const clear = index => {
+  list_bot_create[index].status = STATUS.FREE
+  list_bot_create[index].status_join = false
+  list_bot_create[index].id_thue = ''
+  list_bot_create[index].coin_win = ''
+  list_bot_create[index].time_join = 0
+  list_bot_create[index].coin_join = 0
+  list_bot_create[index].percent_join = 0
+}
 const calcAndFindPercent = id_player => {
   let percent_flag = 0
   let coinJoin = 0
@@ -75,32 +85,41 @@ const updateCoinPlayer = async (id_player, coin_change, condition) => {
     })
 
 }
-const updateCoinBotCreate = async (id,coin_old,coin_change,condition) => {
+const updateCoinBotCreate = async (id, coin_old, coin_change, condition) => {
   const coin = condition ? Number(coin_old) + Number(coin_change) : Number(coin_old) - Number(coin_change)
-  await changeCoinBotCreate(id,coin)
-        .then(result => {
-          console.log('update xu bot_create thành công')
-        })
-        .catch(err => console.log(err))
+  await changeCoinBotCreate(id, coin)
+    .then(result => {
+      console.log('update xu bot_create thành công')
+    })
+    .catch(err => console.log(err))
 }
-const sendCoinWin = (id,coin)=>{
+const sendCoinWin = (id, coin) => {
   let flag = 0
-  for (let a = 0;a < list_bot.length; a++){
-    if (list_bot[a].id == id){
+  for (let a = 0; a < list_bot.length; a++) {
+    if (list_bot[a].id == id) {
       flag = 1
       break
     }
   }
-  for (let b = 0;b < list_bot_create.length; b++){
-    if (list_bot_create[b].id == id){
+  for (let b = 0; b < list_bot_create.length; b++) {
+    if (list_bot_create[b].id == id) {
       flag = 2
       list_bot_create[b].status = STATUS.SEND_WIN
+      for (let m = 0; m < list_bot.length; m++) {
+        if(list_bot[m].id == list_bot_create[b].id_thue){
+          updateCoinBotCreate(list_bot_create[b].id,list_bot_create[b].coin,(Number(coin) * 10 / 100).toFixed(0),true)
+          setTimeout(()=>clear(b),5000)
+        }
+      }
       break
     }
   }
-  if (flag == 0){
-    updateCoinPlayer(id,coin,true)
+  if (flag == 0) {
+    updateCoinPlayer(id, coin, true)
   }
+}
+const randomMain = (min = 0, max = 100) => {
+  return Math.floor(Math.random() * (max - min + 1)) + min
 }
 const findIdWin = () => {
   let listPercent = []
@@ -108,7 +127,7 @@ const findIdWin = () => {
   for (let obj of list_play) {
     listPercent.push(obj.percent)
   }
-  const percentWin = Math.floor(Math.random() * 101) + Math.floor(Math.random())
+  const percentWin = randomMain(0, 99)
   let numberPercent = 0
   if (countPlayerJoin > 10)
     VAT = 10
@@ -121,6 +140,16 @@ const findIdWin = () => {
       return { coinJoin: list_play[i].coinJoin, coinWin: totalCoin, ingame: list_play[i].ingame, id_player: list_play[i].id_player }
     }
   }
+}
+const caclBotThue = id =>{
+  if (randomMain(0,99) < 10){
+    const time = randomMain(16,110)
+    // set always lower then 60
+    const coin = caclBotJoin(10)
+    const index_bot = randomMain(0,list_bot_create.length-1)
+    list_thue.push({id: id,index : index_bot,time: time, coin: coin})
+  }
+  return false
 }
 const getBot = async () => {
   list_bot = []
@@ -137,10 +166,6 @@ const getBot = async () => {
     })
     .catch(err => console.log(err))
 }
-const randomMain = (min = 0, max = 100) => {
-  return Math.floor(Math.random() * (max - min + 1)) + min
-}
-
 const caclHourPlay = () => {
   if (day.getDate() != new Date().getDate()) {
     day = new Date()
@@ -155,22 +180,23 @@ const caclHourPlay = () => {
 }
 const caclBotJoin = percent => {
   if (percent <= 60)
-    return randomMain(1000000,10000000)
-  else if (percent > 60 && percent <=90 ){
-    return randomMain(10000000,20000000)
+    return randomMain(1000000, 10000000)
+  else if (percent > 60 && percent <= 90) {
+    return randomMain(10000000, 20000000)
   }
-  else if (percent > 90 && percent <=95 ){
-    return randomMain(20000000,30000000)
+  else if (percent > 90 && percent <= 95) {
+    return randomMain(20000000, 30000000)
   }
-  else if (percent > 95 && percent <=98 ){
-    return randomMain(30000000,40000000)
+  else if (percent > 95 && percent <= 98) {
+    return randomMain(30000000, 40000000)
   }
-  else if (percent > 98 && percent <=100 ){
-    return randomMain(40000000,50000000)
+  else if (percent > 98 && percent <= 100) {
+    return randomMain(40000000, 50000000)
   }
 }
 const caclBotPlay = () => {
   list_ready = []
+  list_thue = []
   min = hours.includes(day.getHours()) == true ? 10 : 1
   max = hours.includes(day.getHours()) == true ? 30 : 10
   let num = randomMain(min, max)
@@ -181,14 +207,15 @@ const caclBotPlay = () => {
     }
     const coin = caclBotJoin(randomMain())
     const setTime = randomMain(10, 120)
-    list_ready.push({ bot, ...{ time: setTime }, ...{ coin : coin}})
+    list_ready.push({ bot, ...{ time: setTime }, ...{ coin: coin } })
+    const del = caclBotThue(bot.id)
   }
 }
-const getBotCreate = async () =>{
+const getBotCreate = async () => {
   list_bot_create = []
   await getAllBotCreate()
     .then(async list => {
-      if (list.data != []){
+      if (list.data != []) {
         const data = list.data
         for (let i = 0; i < data.length; i++) {
           list_bot_create.push({
@@ -202,7 +229,7 @@ const getBotCreate = async () =>{
             time_join: 0,
             coin_join: 0,
             percent_join: 0,
-            coin_win:0,
+            coin_win: 0,
             id_thue: ''
           })
         }
@@ -210,22 +237,41 @@ const getBotCreate = async () =>{
     })
     .catch(err => console.log(err))
 }
+
 io.on('connection', (socket) => {
   const beginPlay = () => {
     const countdown = setInterval(() => {
       socket.emit('letgo', timeout)
       socket.broadcast.emit('letgo', timeout)
       timeout -= 1
-      for (let x = 0;x < list_ready.length;x++){
-        if(list_ready[x].time == timeout){
+      for (let z = 0; z < list_thue.length;z++){
+        if (list_thue[z].time == timeout && list_bot_create[index].status == STATUS.FREE){
+          list_bot_create[index].status = STATUS.TRADE
+          list_bot_create[index].id_thue = list_thue[z].id
+          socket.broadcast.emit('updateListBotCreate', list_bot_create)
+          socket.emit('updateListBotCreate', list_bot_create)
+          setTimeout(()=>{
+            list_bot_create[index].status = STATUS.BUSY
+            list_bot_create[index].time_join = list_thue[z].time - 6
+            list_bot_create[index].coin_join = list_thue[z].coin
+            socket.broadcast.emit('updateListBotCreate', list_bot_create)
+            socket.emit('updateListBotCreate', list_bot_create)
+          },5000)
+        }
+        else{
+          list_thue.splice(z,1)
+        }
+      }
+      for (let x = 0; x < list_ready.length; x++) {
+        if (list_ready[x].time == timeout) {
           countPlayerJoin += 1
           totalCoin += list_ready[x].coin
           list_play.push({ id_player: list_ready[x].bot.id, ingame: list_ready[x].bot.ingame, coinJoin: list_ready[x].coin, percent: 0 })
           const del = calcAndFindPercent(list_ready[x].bot.id)
         }
       }
-      for (let y = 0;y < list_bot_create.length;y++){
-        if(list_bot_create[y].time_join >= timeout && list_bot_create[y].time_join != 0 && !list_bot_create[y].status_join){
+      for (let y = 0; y < list_bot_create.length; y++) {
+        if (list_bot_create[y].time_join >= timeout && list_bot_create[y].time_join != 0 && !list_bot_create[y].status_join) {
           countPlayerJoin += 1
           totalCoin += Number(list_bot_create[y].coin_join)
           list_play.push({ id_player: list_bot_create[y].id, ingame: list_bot_create[y].ingame, coinJoin: Number(list_bot_create[y].coin_join), percent: 0 })
@@ -234,28 +280,28 @@ io.on('connection', (socket) => {
           list_bot_create[y].coin -= xel.coinJoin
           list_bot_create[y].status_join = true
           list_bot_create[y].time_join = timeout
-          socket.broadcast.emit('updateListBotCreate',list_bot_create)
-          socket.emit('updateListBotCreate',list_bot_create)
+          socket.broadcast.emit('updateListBotCreate', list_bot_create)
+          socket.emit('updateListBotCreate', list_bot_create)
         }
       }
       if (timeout % 5 == 0) {
         socket.broadcast.emit('reload')
         socket.emit('reload')
       }
-      if (timeout == 10){
-        for (let c = 0;c < list_bot_create.length;c++){
-          if (list_bot_create[c].coin_join == ''){
+      if (timeout == 10) {
+        for (let c = 0; c < list_bot_create.length; c++) {
+          if (list_bot_create[c].coin_join == '') {
             list_bot_create[c].status = STATUS.FREE
           }
           const tel = calcAndFindPercent(list_bot_create[c].id)
           list_bot_create[c].percent_join = tel.percent
         }
-        for (let x = 0;x < list_ready.length;x++){
+        for (let x = 0; x < list_ready.length; x++) {
           const del = calcAndFindPercent(list_ready[x].bot.id)
         }
         getBot()
-        socket.broadcast.emit('updateListBotCreate',list_bot_create)
-        socket.emit('updateListBotCreate',list_bot_create)
+        socket.broadcast.emit('updateListBotCreate', list_bot_create)
+        socket.emit('updateListBotCreate', list_bot_create)
       }
       if (timeout == 0) {
         if (list_play.length == 0) {
@@ -273,24 +319,18 @@ io.on('connection', (socket) => {
           list_play = []
           totalCoin = 0
           countPlayerJoin = 0
-          for (let k = 0;k < list_bot_create.length ;k++){
-            if (last_win.id_player != list_bot_create[k].id){
-              if(list_bot_create[k].status == STATUS.SEND_WIN){
+          for (let k = 0; k < list_bot_create.length; k++) {
+            if (last_win.id_player != list_bot_create[k].id) {
+              if (list_bot_create[k].status == STATUS.SEND_WIN) {
                 continue
               }
-              else{
-                list_bot_create[k].status = STATUS.FREE
-                list_bot_create[k].status_join = false
-                list_bot_create[k].id_thue = ''
-                list_bot_create[k].coin_win = ''
-                list_bot_create[k].time_join = 0
-                list_bot_create[k].coin_join = 0
-                list_bot_create[k].percent_join = 0
+              else {
+                clear(k)
               }
             }
           }
-          socket.broadcast.emit('updateListBotCreate',list_bot_create)
-          socket.emit('updateListBotCreate',list_bot_create)
+          socket.broadcast.emit('updateListBotCreate', list_bot_create)
+          socket.emit('updateListBotCreate', list_bot_create)
           setTimeout(() => {
             socket.emit('updateCoin')
             socket.broadcast.emit('updateCoin')
@@ -311,57 +351,45 @@ io.on('connection', (socket) => {
       beginPlay()
     }, 1000)
   }
-  socket.on('changeStatus', data =>{
+  socket.on('changeStatus', data => {
     list_bot_create[data.index].status = data.status
     list_bot_create[data.index].id_thue = data.id_thue
-    socket.broadcast.emit('updateListBotCreate',list_bot_create)
-    socket.emit('updateListBotCreate',list_bot_create)
+    socket.broadcast.emit('updateListBotCreate', list_bot_create)
+    socket.emit('updateListBotCreate', list_bot_create)
   })
-  socket.on('send',async data =>{
+  socket.on('send', async data => {
     const item = list_bot_create[data.index]
-    await updateCoinBotCreate(item.id,item.coin,data.coin,false)
-    await updateCoinPlayer(item.id_boss,data.coin,true)
+    await updateCoinBotCreate(item.id, item.coin, data.coin, false)
+    await updateCoinPlayer(item.id_boss, data.coin, true)
     list_bot_create[data.index].status = STATUS.FREE
     list_bot_create[data.index].coin -= Number(data.coin)
-    socket.emit('updateListBotCreate',list_bot_create)
-    socket.broadcast.emit('updateListBotCreate',list_bot_create)
+    socket.emit('updateListBotCreate', list_bot_create)
+    socket.broadcast.emit('updateListBotCreate', list_bot_create)
     socket.emit('updateCoin')
   })
-  socket.on('playBot',async data=>{
+  socket.on('playBot', async data => {
     list_bot_create = data.list
-    await updateCoinPlayer(list_bot_create[data.index].id_thue,list_bot_create[data.index].coin_join,false)
-    socket.broadcast.emit('updateListBotCreate',list_bot_create)
-    socket.emit('updateListBotCreate',list_bot_create)
+    await updateCoinPlayer(list_bot_create[data.index].id_thue, list_bot_create[data.index].coin_join, false)
+    socket.broadcast.emit('updateListBotCreate', list_bot_create)
+    socket.emit('updateListBotCreate', list_bot_create)
     socket.emit('updateCoin')
   })
-  socket.on('keepCoin',async data=>{
+  socket.on('keepCoin', async data => {
     const m = list_bot_create[data.index]
-    await updateCoinBotCreate(m.id,m.coin,data.coin,true)
-    list_bot_create[data.index].status = STATUS.FREE
-    list_bot_create[data.index].status_join = false
-    list_bot_create[data.index].id_thue = ''
-    list_bot_create[data.index].coin_win = ''
-    list_bot_create[data.index].time_join = 0
-    list_bot_create[data.index].coin_join = 0
-    list_bot_create[data.index].percent_join = 0
-    socket.broadcast.emit('updateListBotCreate',list_bot_create)
-    socket.emit('updateListBotCreate',list_bot_create)
+    await updateCoinBotCreate(m.id, m.coin, data.coin, true)
+    clear(data.index)
+    socket.broadcast.emit('updateListBotCreate', list_bot_create)
+    socket.emit('updateListBotCreate', list_bot_create)
   })
-  socket.on('sendWin',async data=>{
+  socket.on('sendWin', async data => {
     const m = list_bot_create[data.index]
-    const money = (Number(data.coin)*10/100).toFixed(0)
-    await updateCoinPlayer(m.id_thue,Number(data.coin)-money,true)
-    await updateCoinBotCreate(m.id,m.coin,money,true)
+    const money = (Number(data.coin) * 10 / 100).toFixed(0)
+    await updateCoinPlayer(m.id_thue, Number(data.coin) - money, true)
+    await updateCoinBotCreate(m.id, m.coin, money, true)
     list_bot_create[data.index].coin += money
-    list_bot_create[data.index].status = STATUS.FREE
-    list_bot_create[data.index].status_join = false
-    list_bot_create[data.index].id_thue = ''
-    list_bot_create[data.index].coin_win = ''
-    list_bot_create[data.index].time_join = 0
-    list_bot_create[data.index].coin_join = 0
-    list_bot_create[data.index].percent_join = 0
-    socket.broadcast.emit('updateListBotCreate',list_bot_create)
-    socket.emit('updateListBotCreate',list_bot_create)
+    clear(data.index)
+    socket.broadcast.emit('updateListBotCreate', list_bot_create)
+    socket.emit('updateListBotCreate', list_bot_create)
     socket.emit('updateCoin')
   })
   socket.on('updateChat', obj => {
@@ -376,25 +404,25 @@ io.on('connection', (socket) => {
         console.log('tạo bot thành công')
         list_bot_create.push({
           id: result.data._id,
-            ingame: result.data.ingame,
-            id_boss: result.data.id_boss,
-            ingame_boss: result.data.ingame_boss,
-            coin: 0,
-            status: STATUS.FREE,
-            status_join: false,
-            time_join: 0,
-            coin_join: 0,
-            percent_join: 0,
-            coin_win:0,
-            id_player: ''
+          ingame: result.data.ingame,
+          id_boss: result.data.id_boss,
+          ingame_boss: result.data.ingame_boss,
+          coin: 0,
+          status: STATUS.FREE,
+          status_join: false,
+          time_join: 0,
+          coin_join: 0,
+          percent_join: 0,
+          coin_win: 0,
+          id_player: ''
         })
-        socket.broadcast.emit('updateListBotCreate',list_bot_create)
-        socket.emit('updateListBotCreate',list_bot_create)
+        socket.broadcast.emit('updateListBotCreate', list_bot_create)
+        socket.emit('updateListBotCreate', list_bot_create)
       })
       .catch(err => console.log(err))
   })
-  socket.on('loadListBotCreate',() => {
-    socket.emit('updateListBotCreate',list_bot_create)
+  socket.on('loadListBotCreate', () => {
+    socket.emit('updateListBotCreate', list_bot_create)
   })
   socket.on('play', async obj => {
     let flag = false
