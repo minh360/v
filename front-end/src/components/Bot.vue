@@ -67,7 +67,7 @@
 </template>
 <script setup>
 import { socket } from '@/main';
-import { defineProps, defineEmits, onMounted } from 'vue';
+import { defineProps,ref } from 'vue';
 import { getPlayer } from '../../../backend/api';
 import { STATUS } from '@/share';
 const bot = defineProps({
