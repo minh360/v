@@ -86,13 +86,14 @@ const updateCoinPlayer = async (id_player, coin_change, condition) => {
 
 }
 const updateCoinBotCreate = async (id, coin_old, coin_change, condition) => {
+  let send
   const coin = Number(condition ? Number(coin_old) + Number(coin_change) : Number(coin_old) - Number(coin_change))
   await changeCoinBotCreate(id, coin)
     .then(result => {
-      const coin = result.data.coin
-      return coin
+      send = result.data.coin
     })
     .catch(err => console.log(err))
+  return send
 }
 const randomMain = (min = 0, max = 100) => {
   return Math.floor(Math.random() * (max - min + 1)) + min
@@ -365,6 +366,7 @@ io.on('connection', (socket) => {
     await updateCoinPlayer(item.id_boss, data.coin, true)
     list_bot_create[data.index].status = STATUS.FREE
     list_bot_create[data.index].coin = updateCoinBotCreate(item.id, item.coin, data.coin, false)
+    console.log(list_bot_create[data.index])
     setTimeout(()=>{
       socket.emit('updateListBotCreate', list_bot_create)
       socket.broadcast.emit('updateListBotCreate', list_bot_create)
