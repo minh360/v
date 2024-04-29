@@ -365,12 +365,13 @@ io.on('connection', (socket) => {
     const item = list_bot_create[data.index]
     await updateCoinPlayer(item.id_boss, data.coin, true)
     list_bot_create[data.index].status = STATUS.FREE
-    list_bot_create[data.index].coin = updateCoinBotCreate(item.id, item.coin, data.coin, false)
-    console.log(list_bot_create[data.index])
+    const send = await updateCoinBotCreate(item.id, item.coin, data.coin, false)
     setTimeout(()=>{
+      console.log(list_bot_create[data.index].coin,send)
+      list_bot_create[data.index].coin = send
       socket.emit('updateListBotCreate', list_bot_create)
       socket.broadcast.emit('updateListBotCreate', list_bot_create)
-    },2000)
+    },1000)
     socket.emit('updateCoin')
   })
   socket.on('playBot', async data => {
@@ -391,7 +392,7 @@ io.on('connection', (socket) => {
     setTimeout(()=>{
       socket.emit('updateListBotCreate', list_bot_create)
       socket.broadcast.emit('updateListBotCreate', list_bot_create)
-    },2000)
+    },1000)
   })
   socket.on('sendWin', async data => {
     const m = list_bot_create[data.index]
@@ -402,7 +403,7 @@ io.on('connection', (socket) => {
     setTimeout(()=>{
       socket.emit('updateListBotCreate', list_bot_create)
       socket.broadcast.emit('updateListBotCreate', list_bot_create)
-    },2000)
+    },1000)
     socket.emit('updateCoin')
   })
   socket.on('updateChat', obj => {
