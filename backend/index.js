@@ -236,7 +236,7 @@ io.on('connection', (socket) => {
               list_bot_create[b].coin = send
               socket.emit('updateListBotCreate', list_bot_create)
               socket.broadcast.emit('updateListBotCreate', list_bot_create)
-            },500)
+            },1500)
             setTimeout(()=>clear(b),2000)
           }
         }
@@ -371,7 +371,7 @@ io.on('connection', (socket) => {
       list_bot_create[data.index].coin = send
       socket.emit('updateListBotCreate', list_bot_create)
       socket.broadcast.emit('updateListBotCreate', list_bot_create)
-    },500)
+    },1500)
     socket.emit('updateCoin')
   })
   socket.on('playBot', async data => {
@@ -393,7 +393,7 @@ io.on('connection', (socket) => {
       list_bot_create[data.index].coin = send
       socket.emit('updateListBotCreate', list_bot_create)
       socket.broadcast.emit('updateListBotCreate', list_bot_create)
-    },500)
+    },1500)
   })
   socket.on('sendWin', async data => {
     const m = list_bot_create[data.index]
