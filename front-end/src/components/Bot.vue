@@ -13,7 +13,7 @@
     </div>
 
     <div class="flex flex-col items-center justify-center mt-[10px] h-full w-full gap-[10px]"
-      v-if="bot.status == STATUS.SEND">
+      v-if="bot.status == STATUS.SEND && bot.id_boss == bot.id_player">
       <input type="number" class="w-[50%] border-1 border px-[10px] rounded h-[40px]" v-model="coinSend"
         placeholder="Rút xu" v-on:keyup.enter="send(zin)" />
       <button @click="send(zin)" class="w-[30%]">Rút xu</button>
