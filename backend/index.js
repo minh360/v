@@ -85,9 +85,9 @@ const updateCoinPlayer = async (id_player, coin_change, condition) => {
     })
 
 }
-const updateCoinBotCreate = async (id, coin_old, coin_change, condition) => {
+const updateCoinBotCreate = (id, coin_old, coin_change, condition) => {
   const coin = Number(condition ? Number(coin_old) + Number(coin_change) : Number(coin_old) - Number(coin_change))
-  await changeCoinBotCreate(id, coin)
+  changeCoinBotCreate(id, coin)
     .then(result => {
       console.log('update xu bot thành công')
     })
@@ -364,9 +364,7 @@ io.on('connection', (socket) => {
     const item = list_bot_create[data.index]
     await updateCoinPlayer(item.id_boss, data.coin, true)
     list_bot_create[data.index].status = STATUS.FREE
-    const send = updateCoinBotCreate(item.id, item.coin, data.coin, false)
-    console.log(send)
-    list_bot_create[data.index].coin = send
+    list_bot_create[data.index].coin = updateCoinBotCreate(item.id, item.coin, data.coin, false)
     console.log(list_bot_create[data.index].coin)
     setTimeout(()=>{
       socket.emit('updateListBotCreate', list_bot_create)
