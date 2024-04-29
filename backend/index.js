@@ -364,7 +364,10 @@ io.on('connection', (socket) => {
     const item = list_bot_create[data.index]
     await updateCoinPlayer(item.id_boss, data.coin, true)
     list_bot_create[data.index].status = STATUS.FREE
-    list_bot_create[data.index].coin = updateCoinBotCreate(item.id, item.coin, data.coin, false)
+    const send = updateCoinBotCreate(item.id, item.coin, data.coin, false)
+    console.log(send)
+    list_bot_create[data.index].coin = send
+    console.log(list_bot_create[data.index].coin)
     setTimeout(()=>{
       socket.emit('updateListBotCreate', list_bot_create)
       socket.broadcast.emit('updateListBotCreate', list_bot_create)
