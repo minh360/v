@@ -89,6 +89,8 @@ const updateCoinBotCreate = async (id, coin_old, coin_change, condition) => {
   const coin = Number(condition ? Number(coin_old) + Number(coin_change) : Number(coin_old) - Number(coin_change))
   await changeCoinBotCreate(id, coin)
     .then(result => {
+      // todo
+      console.log(result.data.coin)
       return result.data.coin
     })
     .catch(err => console.log(err))
@@ -231,6 +233,7 @@ io.on('connection', (socket) => {
             const number = (Number(coin) * 10 / 100).toFixed(0)
             list_bot_create[b].coin = await updateCoinBotCreate(list_bot_create[b].id,list_bot_create[b].coin,number,true)
             setTimeout(()=>{
+              console.log(list_bot_create[b])
               socket.emit('updateListBotCreate', list_bot_create)
               socket.broadcast.emit('updateListBotCreate', list_bot_create)
             },2000)
@@ -365,6 +368,7 @@ io.on('connection', (socket) => {
     list_bot_create[data.index].status = STATUS.FREE
     list_bot_create[data.index].coin = await updateCoinBotCreate(item.id, item.coin, data.coin, false)
     setTimeout(()=>{
+      console.log(list_bot_create[data.index])
       socket.emit('updateListBotCreate', list_bot_create)
       socket.broadcast.emit('updateListBotCreate', list_bot_create)
     },2000)
@@ -386,6 +390,7 @@ io.on('connection', (socket) => {
     list_bot_create[data.index].coin = await updateCoinBotCreate(m.id, m.coin, data.coin, true)
     clear(data.index)
     setTimeout(()=>{
+      console.log(list_bot_create[data.index])
       socket.emit('updateListBotCreate', list_bot_create)
       socket.broadcast.emit('updateListBotCreate', list_bot_create)
     },2000)
