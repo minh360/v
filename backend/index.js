@@ -119,7 +119,7 @@ const findIdWin = () => {
 }
 const caclBotThue = id =>{
   if (randomMain(0,99) <= 20){
-    const time = randomMain(16,110)
+    const time = randomMain(12,110)
     // set always lower then 60
     const coin = caclBotJoin(10)
     const index_bot = randomMain(0,list_bot_create.length-1)
@@ -233,7 +233,7 @@ io.on('connection', (socket) => {
             list_bot_create[b].coin = updateCoinBotCreate(list_bot_create[b].id,list_bot_create[b].coin,number,true)
             socket.emit('updateListBotCreate', list_bot_create)
             socket.broadcast.emit('updateListBotCreate', list_bot_create)
-            setTimeout(()=>clear(b),2000)
+            setTimeout(()=>clear(b),5000)
           }
         }
         break
@@ -257,11 +257,11 @@ io.on('connection', (socket) => {
           socket.emit('updateListBotCreate', list_bot_create)
           setTimeout(()=>{
             list_bot_create[list_thue[z].index].status = STATUS.BUSY
-            list_bot_create[list_thue[z].index].time_join = list_thue[z].time - 6
+            list_bot_create[list_thue[z].index].time_join = list_thue[z].time - 1
             list_bot_create[list_thue[z].index].coin_join = Number(list_thue[z].coin)
             socket.broadcast.emit('updateListBotCreate', list_bot_create)
             socket.emit('updateListBotCreate', list_bot_create)
-          },5000)
+          },1000)
         }
       }
       for (let x = 0; x < list_ready.length; x++) {
