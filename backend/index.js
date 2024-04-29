@@ -89,9 +89,8 @@ const updateCoinBotCreate = async (id, coin_old, coin_change, condition) => {
   const coin = Number(condition ? Number(coin_old) + Number(coin_change) : Number(coin_old) - Number(coin_change))
   await changeCoinBotCreate(id, coin)
     .then(result => {
-      // todo
-      console.log(result.data.coin)
-      return result.data.coin
+      const coin = result.data.coin
+      return coin
     })
     .catch(err => console.log(err))
 }
