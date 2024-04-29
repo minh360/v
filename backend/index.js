@@ -91,9 +91,9 @@ const updateCoinBotCreate = async (id, coin_old, coin_change, condition) => {
   await changeCoinBotCreate(id, coin)
     .then(result => {
       send = result.data.coin
+      return send
     })
     .catch(err => console.log(err))
-  return send
 }
 const randomMain = (min = 0, max = 100) => {
   return Math.floor(Math.random() * (max - min + 1)) + min
