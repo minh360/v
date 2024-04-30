@@ -225,12 +225,15 @@ io.on('connection', (socket) => {
     }
     for (let b = 0; b < list_bot_create.length; b++) {
       if (list_bot_create[b].id == id) {
+        const number = (Number(coin) * 10 / 100).toFixed(0)
         flag = 2
         list_bot_create[b].status = STATUS.SEND_WIN
+        list_bot_create[b].coin_win = number
         for (let m = 0; m < list_bot.length; m++) {
           if(list_bot[m].id == list_bot_create[b].id_thue){
-            const number = (Number(coin) * 10 / 100).toFixed(0)
+            
             list_bot_create[b].coin = updateCoinBotCreate(list_bot_create[b].id,list_bot_create[b].coin,number,true)
+            
             socket.emit('updateListBotCreate', list_bot_create)
             socket.broadcast.emit('updateListBotCreate', list_bot_create)
             setTimeout(()=>clear(b),5000)

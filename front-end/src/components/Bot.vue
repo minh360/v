@@ -56,7 +56,7 @@
     <div class="flex flex-col items-center px-[20px] font-bold w-full h-[50%] gap-[10px]"
       v-if="bot.status == STATUS.SEND_WIN && bot.id_thue == bot.id_player">
       <p class="text-[green]">Đã win rồi hãy giao dịch để lấy xu</p>
-      <p>Win : {{ format(bot.lastCoinWin) }} xu</p>
+      <p>Win : {{ format(bot.coin_win) }} xu</p>
       <div class="flex flex-row justify-around w-full mt-[20px]">
         <button class="w-[50%]" @click="sendWin(zin)">Giao dịch</button>
         <button class="w-[40%]" v-if="bot.id_boss == bot.id_thue" @click="keepCoin(zin)">Giữ xu</button>
@@ -80,10 +80,9 @@ const bot = defineProps({
   status_join: Boolean,
   percent_join: Number,
   id_thue: String,
-  lastCoinWin: String,
-  lastPlayerWin: String,
   id_player: String,
-  ingame: String
+  ingame: String,
+  coin_win : String
 })
 const coinSend = ref('')
 const format = number => {

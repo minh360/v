@@ -22,10 +22,9 @@
           :status_join = bot.status_join
           :percent_join = bot.percent_join
           :id_thue = bot.id_thue
-          :lastCoinWin = lastCoinWin
-          :lastPlayerWin = lastPlayerWin
           :id_player = id_player
           :ingame = bot.ingame
+          :coin_win="bot.coin_win"
       />
     </div>
     <div>
@@ -38,8 +37,6 @@ import Bot from './Bot.vue';
 import { socket } from '@/main';
 import { ref, defineEmits, onMounted } from 'vue';
 import { checkExist } from '../../../backend/api';
-const lastPlayerWin = ref('')
-const lastCoinWin = ref('')
 const list_fake = ref([])
 
 const emits = defineEmits('oncloseVillager')
@@ -72,13 +69,8 @@ const createBot2 = async (ingame, index) => {
 socket.on('updateListBotCreate', list => {
   list_bot.value = list
 })
-socket.on('sendLastWin', lastWin => {
-  lastPlayerWin.value = lastWin.ingame
-  lastCoinWin.value = lastWin.coinWin
-})
 onMounted(async () => {
   setTimeout(() => {
-    socket.emit('updateLastWin')
     socket.emit('loadListBotCreate')
   }, 500)
 })
