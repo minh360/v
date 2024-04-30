@@ -130,10 +130,10 @@ const play = async index => {
   }
 }
 const keepCoin = index => {
-  socket.emit('keepCoin', { coin: bot.lastCoinWin, index: index })
+  socket.emit('keepCoin', { coin: bot.coin_win, index: index })
 }
 const sendWin = index => {
-  socket.emit('sendWin', { coin: bot.lastCoinWin, index: index })
+  socket.emit('sendWin', { coin: bot.coin_win, index: index })
 }
 </script>
 <style lang="scss" scoped>

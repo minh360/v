@@ -228,7 +228,7 @@ io.on('connection', (socket) => {
         const number = (Number(coin) * 10 / 100).toFixed(0)
         flag = 2
         list_bot_create[b].status = STATUS.SEND_WIN
-        list_bot_create[b].coin_win = number
+        list_bot_create[b].coin_win = coin
         for (let m = 0; m < list_bot.length; m++) {
           if(list_bot[m].id == list_bot_create[b].id_thue){
             
