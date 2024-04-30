@@ -327,7 +327,7 @@ io.on('connection', (socket) => {
                 continue
               }
               else {
-                setTimeout(()=>clear(k),3000)
+                clear(k)
               }
             }
           }
