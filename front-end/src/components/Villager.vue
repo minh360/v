@@ -49,21 +49,26 @@ const deleteCreateBot = index => {
 const createBot1 = () => {
   list_fake.value.unshift({ ingame: '', mode: true })
 }
-
 const createBot2 = async (ingame, index) => {
-  await checkExist(ingame)
-    .then(result => {
-      if (!result) {
-        const data = {
-          ingame: ingame,
-          id_boss: id_player.value,
-          ingame_boss: ingameClient.value
-        }
-        socket.emit('addBotCreate', data)
-        deleteCreateBot(index)
-      }
-      else alert('Ingame đã tồn tại')
-    })
+  await getPlayer(id_player.value)
+        .then(result =>{
+          if(result.data.coin >= 1000000000){
+            await checkExist(ingame)
+              .then(result => {
+                if (!result) {
+                  const data = {
+                    ingame: ingame,
+                    id_boss: id_player.value,
+                    ingame_boss: ingameClient.value
+                  }
+                  socket.emit('addBotCreate', data)
+                  deleteCreateBot(index)
+                }
+                else alert('Ingame đã tồn tại')
+              })
+            }
+            else alert('Hãy để dành 2 tỷ xu để tạo')
+            })
 }
 
 socket.on('updateListBotCreate', list => {
