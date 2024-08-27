@@ -50,13 +50,11 @@ const signIn = async () => {
   if(message.value === ''){
     await getInforPlayer(ingame.value)
         .then(player => {
-          console.log(player.data.password,password.value)
           if(player.data.password == password.value){
             message.value = 'Đăng nhập thành công tài khoản '+ ingame.value
             sessionStorage.setItem('id_player',player.data._id)
             sessionStorage.setItem('ingame_client',player.data.ingame)
-            socket.emit('updateChat',{alert: player.data.ingame + ' đã tham gia chat'})
-            // setTimeout(()=>location.reload(),2000)
+            setTimeout(()=>location.reload(),2000)
           }
           else message.value = 'Tài khoản hoặc mật khẩu không chính xác'
         })

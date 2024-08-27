@@ -399,9 +399,6 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('updateListBotCreate', list_bot_create)
     socket.emit('updateCoin')
   })
-  socket.on('updateChat', obj => {
-    socket.broadcast.emit('sendMessage', obj)
-  })
   socket.on('updateLastWin', () => {
     socket.emit('sendLastWin', last_win)
   })
