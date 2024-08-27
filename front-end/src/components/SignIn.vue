@@ -50,6 +50,7 @@ const signIn = async () => {
   if(message.value === ''){
     await getInforPlayer(ingame.value)
         .then(player => {
+          console.log(player.data.password,password.value)
           if(player.data.password == password.value){
             message.value = 'Đăng nhập thành công tài khoản '+ ingame.value
             sessionStorage.setItem('id_player',player.data._id)
