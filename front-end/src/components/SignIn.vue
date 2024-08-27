@@ -56,7 +56,7 @@ const signIn = async () => {
             sessionStorage.setItem('id_player',player.data._id)
             sessionStorage.setItem('ingame_client',player.data.ingame)
             socket.emit('updateChat',{alert: player.data.ingame + ' đã tham gia chat'})
-            setTimeout(()=>location.reload(),2000)
+            // setTimeout(()=>location.reload(),2000)
           }
           else message.value = 'Tài khoản hoặc mật khẩu không chính xác'
         })

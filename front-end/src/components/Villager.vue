@@ -52,8 +52,8 @@ const createBot1 = () => {
 const createBot2 = async (ingame, index) => {
   await getPlayer(id_player.value)
         .then(result =>{
+          console.log(result.data.coin >= 2000000000,result.data.coin)
           if(result.data.coin >= 2000000000){
-            console.log(result.data.coin >= 2000000000,result.data.coin)
             await checkExist(ingame)
               .then(result => {
                 if (!result) {
