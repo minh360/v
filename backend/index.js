@@ -250,7 +250,7 @@ io.on('connection', (socket) => {
       socket.emit('letgo', timeout)
       socket.broadcast.emit('letgo', timeout)
       timeout -= 1
-      if(list_thue.length != 0){
+      if(list_bot_create.length != 0){
         for (let z = 0; z < list_thue.length;z++){
           if (list_thue[z].time == timeout && list_bot_create[list_thue[z].index].status == STATUS.FREE){
             list_bot_create[list_thue[z].index].status = STATUS.TRADE
