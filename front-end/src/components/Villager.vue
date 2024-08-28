@@ -36,7 +36,7 @@
 import Bot from './Bot.vue';
 import { socket } from '@/main';
 import { ref, defineEmits, onMounted } from 'vue';
-import { checkExist } from '../../../backend/api';
+import { checkExist,getPlayer } from '../../../backend/api';
 const list_fake = ref([])
 
 const emits = defineEmits('oncloseVillager')
