@@ -309,6 +309,11 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('updateListBotCreate', list_bot_create)
         socket.emit('updateListBotCreate', list_bot_create)
       }
+      if (timeout == 3){
+        for( let o = 0; o < list_play.length; o++){
+          const debug = calcAndFindPercent(list_play[o].id_player)
+        }
+      }
       if (timeout == 0) {
         if (list_play.length == 0) {
           clearInterval(countdown)
